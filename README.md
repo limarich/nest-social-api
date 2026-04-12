@@ -1,98 +1,229 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Social API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API REST para uma rede social simples com suporte a postagens, comentários e sistema de seguidores.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## Requisitos funcionais
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### Usuários
 
-## Project setup
+- Um usuário pode criar uma conta fornecendo nome, email e senha
+- Um usuário pode autenticar com email e senha
+- Um usuário pode ter perfil com permissão de administrador ou usuário comum
+- Administradores têm acesso a recursos restritos de gerenciamento
+
+### Seguidores
+
+- Um usuário pode seguir outro usuário
+- Um usuário pode deixar de seguir outro usuário
+- Um usuário pode consultar sua lista de seguidores
+- Um usuário pode consultar a lista de usuários que está seguindo
+
+### Postagens
+
+- Um usuário autenticado pode criar uma postagem
+- Um usuário autenticado pode editar suas próprias postagens
+- Um usuário autenticado pode excluir suas próprias postagens (soft delete)
+- Apenas administradores podem remover postagens permanentemente (hard delete)
+- Qualquer usuário autenticado pode listar e visualizar postagens
+
+### Comentários
+
+- Um usuário autenticado pode comentar em uma postagem
+- Um usuário autenticado pode responder a um comentário existente
+- Um usuário autenticado pode editar seus próprios comentários
+- Um usuário autenticado pode excluir seus próprios comentários (soft delete)
+- Apenas administradores podem remover comentários permanentemente (hard delete)
+- Comentários são exibidos de forma hierárquica (comentário pai e respostas)
+
+---
+
+## Requisitos não funcionais
+
+### Segurança
+
+- Senhas devem ser armazenadas com hash (bcrypt)
+- Autenticação via JWT com tempo de expiração configurável
+- Rotas protegidas devem rejeitar requisições sem token válido com HTTP 401
+- Usuários só podem editar ou excluir seus próprios recursos, exceto administradores
+- Exclusões de usuários comuns são soft delete; o registro é mantido com `deleted_at` preenchido e omitido das listagens
+- Apenas administradores podem executar hard delete, removendo o registro permanentemente do banco
+
+### Validação
+
+- Requisições com dados inválidos devem retornar HTTP 400 com descrição dos erros
+- Email deve ser único no sistema; tentativas de duplicata retornam HTTP 409
+- Campos obrigatórios devem ser validados antes de atingir a camada de serviço
+
+### Desempenho
+
+- A coluna `email` da tabela `users` deve ter índice único
+- As colunas `follower_id` e `following_id` da tabela `follows` devem ser indexadas
+- A coluna `post_id` da tabela `comments` deve ser indexada para listagem eficiente
+
+### Manutenibilidade
+
+- A aplicação segue a separação em camadas: controller, service e repository
+- Regras de negócio residem exclusivamente na camada de serviço
+- Validações de formato e entrada residem na camada de controller via DTOs
+
+### Rastreabilidade
+
+- Todos os recursos armazenam `created_at` com timezone UTC
+- Recursos editáveis armazenam `updated_at` atualizado automaticamente
+- Recursos com soft delete armazenam `deleted_at`, nulo enquanto o registro estiver ativo
+
+---
+
+## Modelo de dados
+
+| Entidade | Descrição |
+|---|---|
+| `User` | Representa um usuário da plataforma |
+| `Follow` | Representa a relação de seguimento entre dois usuários |
+| `Post` | Representa uma postagem criada por um usuário |
+| `Comment` | Representa um comentário em uma postagem ou resposta a outro comentário |
+
+---
+
+## Stack
+
+- **Runtime:** Node.js
+- **Framework:** NestJS
+- **Linguagem:** TypeScript
+- **ORM:** TypeORM
+- **Banco de dados:** PostgreSQL
+- **Autenticação:** JWT
+
+---
+
+## Configuração e execução
+
+### Pré-requisitos
+
+- Node.js >= 18
+- PostgreSQL >= 14
+- npm ou yarn
+
+### Instalação
 
 ```bash
-$ pnpm install
+npm install
 ```
 
-## Compile and run the project
+### Variáveis de ambiente
+
+Crie um arquivo `.env` na raiz do projeto com base no `.env.example`:
+
+```env
+# Banco de dados
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+DB_NAME=social_api
+
+# JWT
+JWT_SECRET=your_secret_key
+JWT_EXPIRES_IN=1d
+
+# Aplicação
+APP_PORT=3000
+```
+
+### Executando
 
 ```bash
-# development
-$ pnpm run start
+# desenvolvimento
+npm run start:dev
 
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+# produção
+npm run build
+npm run start:prod
 ```
 
-## Run tests
+### Testes
 
 ```bash
-# unit tests
-$ pnpm run test
+# unitários
+npm run test
 
-# e2e tests
-$ pnpm run test:e2e
+# cobertura
+npm run test:cov
 
-# test coverage
-$ pnpm run test:cov
+# e2e
+npm run test:e2e
 ```
 
-## Deployment
+---
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Estrutura do projeto
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+```
+src/
+├── auth/               # Autenticação JWT (login, guards, estratégias)
+├── user/               # Usuários e perfis
+├── follow/             # Relação de seguidores
+├── post/               # Postagens
+├── comment/            # Comentários e respostas hierárquicas
+└── common/             # Interceptors, filters, decorators compartilhados
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+## Endpoints principais
 
-Check out a few resources that may come in handy when working with NestJS:
+### Auth
+| Método | Rota | Descrição |
+|---|---|---|
+| POST | `/auth/login` | Autenticar usuário |
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### Usuários
+| Método | Rota | Descrição | Acesso |
+|---|---|---|---|
+| POST | `/user` | Criar conta | Público |
+| GET | `/user` | Listar usuários | Autenticado |
+| GET | `/user/:id` | Buscar usuário | Autenticado |
+| PUT | `/user` | Atualizar próprio perfil | Autenticado |
+| DELETE | `/user/:id` | Soft delete | Autenticado |
+| DELETE | `/user/:id/permanent` | Hard delete | Admin |
 
-## Support
+### Seguidores
+| Método | Rota | Descrição |
+|---|---|---|
+| POST | `/follow/:id` | Seguir usuário |
+| DELETE | `/follow/:id` | Deixar de seguir |
+| GET | `/follow/followers` | Listar seguidores |
+| GET | `/follow/following` | Listar quem segue |
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### Postagens
+| Método | Rota | Descrição | Acesso |
+|---|---|---|---|
+| POST | `/post` | Criar postagem | Autenticado |
+| GET | `/post` | Listar postagens | Autenticado |
+| GET | `/post/:id` | Buscar postagem | Autenticado |
+| PUT | `/post/:id` | Editar própria postagem | Autenticado |
+| DELETE | `/post/:id` | Soft delete | Autenticado (dono) |
+| DELETE | `/post/:id/permanent` | Hard delete | Admin |
 
-## Stay in touch
+### Comentários
+| Método | Rota | Descrição | Acesso |
+|---|---|---|---|
+| POST | `/comment` | Comentar em postagem | Autenticado |
+| POST | `/comment/:id/reply` | Responder comentário | Autenticado |
+| PUT | `/comment/:id` | Editar próprio comentário | Autenticado |
+| DELETE | `/comment/:id` | Soft delete | Autenticado (dono) |
+| DELETE | `/comment/:id/permanent` | Hard delete | Admin |
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+---
 
-## License
+## Relacionamentos entre entidades
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+```
+User (1) ──── (N) Post
+User (1) ──── (N) Comment
+User (N) ──── (N) User       via Follow (follower_id, following_id)
+Post (1) ──── (N) Comment
+Comment (1) ── (N) Comment   auto-referência (parent_id)
+```
