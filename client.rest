@@ -1,0 +1,35 @@
+@baseUrl = http://localhost:3000
+
+### List Users
+GET {{baseUrl}}/user
+
+### Find User
+
+GET {{baseUrl}}/user/1
+
+### Create New User
+
+POST {{baseUrl}}/user/ 
+Content-Type: application/json
+
+{
+    "name": "John",
+    "email": "richard.esclima@gmail.com",
+    "password": "password"
+} 
+
+### Update User
+
+PUT  {{baseUrl}}/user
+Content-Type: application/json
+
+{
+    "id": 2,
+    "name": "John",
+    "email": "richard.esclima@gmail.com",
+    "password": "password"
+} 
+
+### Delete User
+
+DELETE {{baseUrl}}/user/4
