@@ -3,22 +3,27 @@ import { User, UserRole, UserWithoutPassword } from './interface/user.interface'
 import { UserCreateDto } from './dto/user.create.dto';
 import { UserUpdateDto } from './dto/user.update.dto';
 import { IUserService } from './interface/user.service.interface';
+import * as argon from "argon2";
 
 export const EMAIL_ADDRESS = "test@gmail.com";
 
 @Injectable()
 export class UserServiceMock implements IUserService {
+    private users: User[] = [];
 
-    private users: User[] = [{
-        email: EMAIL_ADDRESS,
-        id: 'abc-123',
-        name: 'Richard',
-        password: 'password',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        role: UserRole.USER
-    }];
-    private lastId = 1;
+    public async init() {
+        const password = await argon.hash('password');
+        this.users.push({
+            email: EMAIL_ADDRESS,
+            id: 'abc-123',
+            name: 'Richard',
+            password: password,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            role: UserRole.USER
+        })
+
+    }
 
     async findByEmail(email: string): Promise<User | undefined> {
         const user = this.users.find(user => user.email === email);

@@ -11,6 +11,7 @@ describe('UserService', () => {
     }).compile();
 
     service = module.get<UserServiceMock>(UserServiceMock);
+    await service.init(); // Initialize the mock database
   });
 
   it('should find user by email', async () => {
@@ -68,6 +69,5 @@ describe('UserService', () => {
     const users = await service.findAll();
     expect(users).toBeDefined();
   });
-
 
 });

@@ -24,7 +24,7 @@ PUT  {{baseUrl}}/user
 Content-Type: application/json
 
 {
-    "id": 2,
+    "id": "cb76f931-a491-4631-a871-888fa94aa330",
     "name": "John",
     "email": "richard.esclima@gmail.com",
     "password": "password"
@@ -32,4 +32,14 @@ Content-Type: application/json
 
 ### Delete User
 
-DELETE {{baseUrl}}/user/4
+DELETE {{baseUrl}}/user/cb76f931-a491-4631-a871-888fa94aa330
+
+
+### User login 
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "richard.esclima@gmail.com",
+    "password": "password"
+}

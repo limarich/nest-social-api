@@ -1,10 +1,11 @@
-import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { IUserService } from "./interface/user.service.interface";
 import { UserCreateDto } from "./dto/user.create.dto";
 import { UserUpdateDto } from "./dto/user.update.dto";
 import { User, UserWithoutPassword } from "./interface/user.interface";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
+import * as argon from "argon2";
 
 @Injectable()
 export class UserService implements IUserService {
@@ -37,7 +38,8 @@ export class UserService implements IUserService {
     }
     async create(dto: UserCreateDto): Promise<UserWithoutPassword> {
         try {
-            const user = await this.userRepository.save(dto);
+            const hash = await argon.hash(dto.password);
+            const user = await this.userRepository.save({ ...dto, password: hash });
             const { password, ...userWithoutPassword } = user;
             return userWithoutPassword;
         }
@@ -54,14 +56,19 @@ export class UserService implements IUserService {
             if (!existingUser) {
                 throw new NotFoundException(`User with ID ${dto.id} not found`);
             }
+            const updatedUser = { ...existingUser, ...dto };
 
+            if (dto.password) {
+                const hash = await argon.hash(dto.password);
+                updatedUser.password = hash;
+            }
             if (dto.email) {
                 const userWithEmail = await this.userRepository.findOneBy({ email: dto.email });
                 if (userWithEmail && userWithEmail.id !== dto.id) {
                     throw new ConflictException(`User with email ${dto.email} already exists`);
                 }
             }
-            const user = await this.userRepository.save(dto);
+            const user = await this.userRepository.save(updatedUser);
             const { password, ...userWithoutPassword } = user;
             return userWithoutPassword;
         } catch (error) {
