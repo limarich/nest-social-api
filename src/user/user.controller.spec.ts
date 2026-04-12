@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
-import { EMAIL_ADDRESS, UserService } from './user.service';
+import { EMAIL_ADDRESS, UserServiceMock } from './user.service.mock';
 import { ConflictException } from '@nestjs/common';
+import { UserService } from './user.service';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -12,15 +13,14 @@ describe('UserController', () => {
       providers: [{
         provide: UserService,
         useValue: {
-          create: jest.fn().mockImplementation(() => { throw new ConflictException() }),
-          update: jest.fn().mockImplementation(() => { throw new ConflictException() }),
-          findAll: jest.fn().mockReturnValue([]),
+          create: jest.fn().mockRejectedValue(new ConflictException()),
+          update: jest.fn().mockRejectedValue(new ConflictException()),
+          findAll: jest.fn().mockResolvedValue([]),
           findOne: jest.fn(),
           remove: jest.fn(),
         }
       }],
     }).compile();
-
     controller = module.get<UserController>(UserController);
   });
 
@@ -28,17 +28,16 @@ describe('UserController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should not create two users with same email', () => {
-
-    expect(() => controller.create({
+  it('should not create two users with same email', async () => {
+    await expect(controller.create({
       name: 'John', email: EMAIL_ADDRESS, password: 'password'
-    })).toThrow(ConflictException);
+    })).rejects.toThrow(ConflictException);
   });
 
-  it('should not update a user with an existing email', () => {
-    expect(() => controller.update({
-      id: 1, name: 'John', email: 'existing@gmail.com', password: 'password'
-    })).toThrow(ConflictException);
+  it('should not update a user with an existing email', async () => {
+    await expect(controller.update({
+      id: "abc-123", name: 'John', email: 'existing@gmail.com', password: 'password'
+    })).rejects.toThrow(ConflictException);
   });
 
 });

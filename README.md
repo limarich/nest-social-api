@@ -106,7 +106,30 @@ API REST para uma rede social simples com suporte a postagens, comentários e si
 - PostgreSQL >= 14
 - npm ou yarn
 
-### Instalação
+### Com Docker (recomendado)
+
+O projeto inclui um `docker-compose.yml` que sobe a aplicação e o banco PostgreSQL juntos.
+
+```bash
+# subir tudo
+docker compose up -d
+
+# rebuildar após mudanças no código ou Dockerfile
+docker compose up -d --build
+
+# ver logs da aplicação
+docker compose logs -f app
+
+# derrubar tudo mantendo o volume do banco
+docker compose down
+
+# derrubar e apagar o banco também
+docker compose down -v
+```
+
+### Sem Docker
+
+#### Instalação
 
 ```bash
 npm install

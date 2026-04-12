@@ -1,101 +1,81 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { User } from './interface/user.interface';
-import { UserCreateDto } from './dto/user.create.dto';
-import { UserUpdateDto } from './dto/user.update.dto';
-
-export interface UserWithoutPassword extends Omit<User, 'password'> { }
-export const EMAIL_ADDRESS = "test@gmail.com";
+import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import { IUserService } from "./interface/user.service.interface";
+import { UserCreateDto } from "./dto/user.create.dto";
+import { UserUpdateDto } from "./dto/user.update.dto";
+import { User, UserWithoutPassword } from "./interface/user.interface";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
 
 @Injectable()
-export class UserService {
+export class UserService implements IUserService {
+    constructor(@InjectRepository(User) readonly userRepository: Repository<User>) { }
 
-    private users: User[] = [{
-        email: EMAIL_ADDRESS,
-        id: 1,
-        name: 'Richard',
-        password: 'password'
-    }];
-    private lastId = 1;
-
-    findByEmail(email: string): User | undefined {
-        const user = this.users.find(user => user.email === email);
-        return user;
+    async findAll(): Promise<UserWithoutPassword[]> {
+        const users = await this.userRepository.find({
+            select: {
+                id: true,
+                name: true,
+                password: false,
+                role: true,
+                email: true,
+                createdAt: true,
+                updatedAt: true,
+            }
+        })
+        return users;
     }
-
-    findOne(id: number): UserWithoutPassword | undefined {
-        const user = this.users.find(user => user.id === id);
+    async findOne(id: string): Promise<UserWithoutPassword> {
+        const user = await this.userRepository.findOneBy({ id });
 
         if (!user) {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
 
         const { password, ...userWithoutPassword } = user;
+
         return userWithoutPassword;
     }
-
-    findAll(): UserWithoutPassword[] {
-        return this.users.map(user => {
+    async create(dto: UserCreateDto): Promise<UserWithoutPassword> {
+        try {
+            const user = await this.userRepository.save(dto);
             const { password, ...userWithoutPassword } = user;
             return userWithoutPassword;
-        })
+        }
+        catch (error) {
+            if (error.code === '23505') {
+                throw new ConflictException(`User with email ${dto.email} already exists`);
+            }
+            throw error;
+        }
     }
-
-    create(user: UserCreateDto): UserWithoutPassword {
-        const userAlreadyExists = this.findByEmail(user.email);
-
-        if (userAlreadyExists) {
-            throw new ConflictException(`User with email ${user.email} already exists`);
-        }
-
-        const newUser: User = {
-            ...user,
-            id: this.lastId++
-        }
-        this.users.push(newUser);
-        const { password, ...userWithoutPassword } = newUser;
-
-        return userWithoutPassword;
-    }
-
-    update(user: UserUpdateDto): UserWithoutPassword {
-
-        const userIndex = this.users.findIndex(existingUser => existingUser.id === user.id);
-
-        if (userIndex === -1) {
-            throw new NotFoundException(`User with ID ${user.id} not found`);
-        }
-
-        if (user.email) {
-            const existingUser = this.findByEmail(user.email);
-
-            if (existingUser && existingUser.id !== user.id) {
-                throw new ConflictException(`User with email ${user.email} already exists`);
+    async update(dto: UserUpdateDto): Promise<UserWithoutPassword> {
+        try {
+            const existingUser = await this.userRepository.findOneBy({ id: dto.id });
+            if (!existingUser) {
+                throw new NotFoundException(`User with ID ${dto.id} not found`);
             }
 
+            if (dto.email) {
+                const userWithEmail = await this.userRepository.findOneBy({ email: dto.email });
+                if (userWithEmail && userWithEmail.id !== dto.id) {
+                    throw new ConflictException(`User with email ${dto.email} already exists`);
+                }
+            }
+            const user = await this.userRepository.save(dto);
+            const { password, ...userWithoutPassword } = user;
+            return userWithoutPassword;
+        } catch (error) {
+            if (error.code === '23505') {
+                throw new ConflictException(`User with email ${dto.email} already exists`);
+            }
+            throw error;
         }
-
-        const updatedUser: User = {
-            ...this.users[userIndex],
-            ...user,
-        }
-
-        this.users[userIndex] = updatedUser;
-
-        const { password, ...userWithoutPassword } = updatedUser;
-
-        return userWithoutPassword;
     }
-
-    remove(id: number) {
-        const userIndex = this.users.findIndex(user => user.id === id);
-
-        if (userIndex === -1) {
+    async remove(id: string): Promise<void> {
+        const result = await this.userRepository.delete(id);
+        if (result.affected === 0) {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
-
-        this.users.splice(userIndex, 1);
-
-        return;
     }
 
 }

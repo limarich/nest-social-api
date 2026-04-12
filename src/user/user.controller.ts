@@ -1,9 +1,7 @@
-import { BadRequestException, Body, ConflictException, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
-import { validateSync } from 'class-validator';
-import { plainToInstance } from 'class-transformer';
-import { UserService } from './user.service';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { UserCreateDto } from './dto/user.create.dto';
 import { UserUpdateDto } from './dto/user.update.dto';
+import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
@@ -15,7 +13,7 @@ export class UserController {
     }
 
     @Get(':id')
-    findOne(@Param('id', ParseIntPipe) id: number) {
+    findOne(@Param('id') id: string) {
         return this.userService.findOne(id);
     }
 
@@ -30,7 +28,7 @@ export class UserController {
     }
 
     @Delete(':id')
-    remove(@Param('id', ParseIntPipe) id: number) {
+    remove(@Param('id') id: string) {
         return this.userService.remove(id);
     }
 }
