@@ -1,7 +1,7 @@
 @baseUrl = http://localhost:3000
 
 ### List Users
-GET {{baseUrl}}/user
+GET {{baseUrl}}/user?page=1&limit=10
 
 ### Find User
 
@@ -14,7 +14,7 @@ Content-Type: application/json
 
 {
     "name": "John",
-    "email": "richard.esclima@gmail.com",
+    "email": "richard.teste@gmail.com",
     "password": "password"
 } 
 

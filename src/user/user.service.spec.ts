@@ -70,4 +70,9 @@ describe('UserService', () => {
     expect(users).toBeDefined();
   });
 
+  it('should find all users with pagination', async () => {
+    const users = await service.findAll({ page: 1, limit: 10 });
+    expect(users).toBeDefined();
+  });
+
 });

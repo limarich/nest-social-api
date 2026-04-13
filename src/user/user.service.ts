@@ -6,13 +6,19 @@ import { User, UserWithoutPassword } from "./interface/user.interface";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import * as argon from "argon2";
+import { Pagination } from "src/common/interfaces.ts/paginations.interface";
 
 @Injectable()
 export class UserService implements IUserService {
     constructor(@InjectRepository(User) readonly userRepository: Repository<User>) { }
 
-    async findAll(): Promise<UserWithoutPassword[]> {
+    async findAll(pagination: Pagination = {}): Promise<UserWithoutPassword[]> {
+        console.log(typeof pagination.page);
+        console.log(typeof pagination.limit);
+        const { page = 1, limit = 10 } = pagination;
         const users = await this.userRepository.find({
+            skip: (page - 1) * limit,
+            take: limit,
             select: {
                 id: true,
                 name: true,

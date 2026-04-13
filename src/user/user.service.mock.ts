@@ -4,6 +4,7 @@ import { UserCreateDto } from './dto/user.create.dto';
 import { UserUpdateDto } from './dto/user.update.dto';
 import { IUserService } from './interface/user.service.interface';
 import * as argon from "argon2";
+import { Pagination } from 'src/common/interfaces.ts/paginations.interface';
 
 export const EMAIL_ADDRESS = "test@gmail.com";
 
@@ -41,8 +42,15 @@ export class UserServiceMock implements IUserService {
         return userWithoutPassword;
     }
 
-    async findAll(): Promise<UserWithoutPassword[]> {
-        return this.users.map(user => {
+    async findAll(pagination: Pagination = {}): Promise<UserWithoutPassword[]> {
+        const { page = 1, limit = 10 } = pagination;
+
+        const skip = (page - 1) * limit;
+        const take = limit;
+
+        const users = this.users.slice(skip, skip + take);
+
+        return users.map(user => {
             const { password, ...userWithoutPassword } = user;
             return userWithoutPassword;
         })
