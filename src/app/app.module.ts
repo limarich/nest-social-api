@@ -7,6 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from 'src/auth/auth.module';
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { AllExceptionsFilter } from 'src/common/filters/all-exceptions.filter';
+import { LoggerModule } from 'nestjs-pino';
 
 @Module({
   imports: [
@@ -26,6 +27,13 @@ import { AllExceptionsFilter } from 'src/common/filters/all-exceptions.filter';
         autoLoadEntities: true,
         synchronize: config.get('NODE_ENV') === 'development',
       }),
+    }),
+    LoggerModule.forRoot({
+      pinoHttp: {
+        transport: process.env.NODE_ENV === 'development'
+          ? { target: 'pino-pretty' }
+          : undefined,
+      },
     }),
     UserModule,
     AuthModule
@@ -51,4 +59,4 @@ import { AllExceptionsFilter } from 'src/common/filters/all-exceptions.filter';
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}

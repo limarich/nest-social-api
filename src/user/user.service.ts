@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { IUserService } from "./interface/user.service.interface";
 import { UserCreateDto } from "./dto/user.create.dto";
 import { UserUpdateDto } from "./dto/user.update.dto";
@@ -13,8 +13,6 @@ export class UserService implements IUserService {
     constructor(@InjectRepository(User) readonly userRepository: Repository<User>) { }
 
     async findAll(pagination: Pagination = {}): Promise<UserWithoutPassword[]> {
-        console.log(typeof pagination.page);
-        console.log(typeof pagination.limit);
         const { page = 1, limit = 10 } = pagination;
         const users = await this.userRepository.find({
             skip: (page - 1) * limit,
