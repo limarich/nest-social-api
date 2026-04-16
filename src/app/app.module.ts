@@ -5,12 +5,13 @@ import { UserModule } from 'src/user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigType } from '@nestjs/config';
 import { AuthModule } from 'src/auth/auth.module';
-import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { AllExceptionsFilter } from 'src/common/filters/all-exceptions.filter';
 import { LoggerModule } from 'nestjs-pino';
 import { EnvSchema } from 'src/common/schemas/type-orm.schema';
 import { HashModule } from 'src/common/utils/hash/hash.module';
 import databaseConfig from 'src/common/config/database.config';
+import { AuthGuard } from 'src/common/guards/authGuard';
 
 @Module({
   imports: [
@@ -56,6 +57,10 @@ import databaseConfig from 'src/common/config/database.config';
     {
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
     },
   ],
 })
