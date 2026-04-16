@@ -8,12 +8,14 @@ import { AuthModule } from 'src/auth/auth.module';
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { AllExceptionsFilter } from 'src/common/filters/all-exceptions.filter';
 import { LoggerModule } from 'nestjs-pino';
+import { EnvSchema } from 'src/common/schemas/type-orm.schema';
 
 @Module({
   imports: [
     // load .env file globally
     ConfigModule.forRoot({
-      isGlobal: true
+      isGlobal: true,
+      validationSchema: EnvSchema
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
@@ -59,4 +61,4 @@ import { LoggerModule } from 'nestjs-pino';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }

@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { IAuthService } from './interface/IAuthService';
 import { UserLoginDto } from './dto/UserLoginDto';
 import { InjectRepository } from '@nestjs/typeorm';
