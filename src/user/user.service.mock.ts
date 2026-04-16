@@ -4,7 +4,7 @@ import { UserCreateDto } from './dto/user.create.dto';
 import { UserUpdateDto } from './dto/user.update.dto';
 import { IUserService } from './interface/user.service.interface';
 import * as argon from "argon2";
-import { Pagination } from 'src/common/interfaces.ts/paginations.interface';
+import { Pagination } from 'src/common/interfaces/paginations.interface';
 
 export const EMAIL_ADDRESS = "test@gmail.com";
 

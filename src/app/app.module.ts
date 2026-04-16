@@ -9,6 +9,7 @@ import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { AllExceptionsFilter } from 'src/common/filters/all-exceptions.filter';
 import { LoggerModule } from 'nestjs-pino';
 import { EnvSchema } from 'src/common/schemas/type-orm.schema';
+import { HashModule } from 'src/common/utils/hash/hash.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { EnvSchema } from 'src/common/schemas/type-orm.schema';
           : undefined,
       },
     }),
+    HashModule,
     UserModule,
     AuthModule
   ],

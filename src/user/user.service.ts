@@ -5,12 +5,13 @@ import { UserUpdateDto } from "./dto/user.update.dto";
 import { User, UserWithoutPassword } from "./interface/user.interface";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import * as argon from "argon2";
-import { Pagination } from "src/common/interfaces.ts/paginations.interface";
+import { Pagination } from "src/common/interfaces/paginations.interface";
+import { AbstractHashService } from "src/common/interfaces/hash.interface";
 
 @Injectable()
 export class UserService implements IUserService {
-    constructor(@InjectRepository(User) readonly userRepository: Repository<User>) { }
+    constructor(@InjectRepository(User) readonly userRepository: Repository<User>,
+        readonly hashService: AbstractHashService) { }
 
     async findAll(pagination: Pagination = {}): Promise<UserWithoutPassword[]> {
         const { page = 1, limit = 10 } = pagination;
@@ -42,7 +43,7 @@ export class UserService implements IUserService {
     }
     async create(dto: UserCreateDto): Promise<UserWithoutPassword> {
         try {
-            const hash = await argon.hash(dto.password);
+            const hash = await this.hashService.hash(dto.password);
             const user = await this.userRepository.save({ ...dto, password: hash });
             const { password, ...userWithoutPassword } = user;
             return userWithoutPassword;
@@ -63,7 +64,7 @@ export class UserService implements IUserService {
             const updatedUser = { ...existingUser, ...dto };
 
             if (dto.password) {
-                const hash = await argon.hash(dto.password);
+                const hash = await this.hashService.hash(dto.password);
                 updatedUser.password = hash;
             }
             if (dto.email) {

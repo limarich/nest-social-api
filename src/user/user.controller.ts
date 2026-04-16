@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/
 import { UserCreateDto } from './dto/user.create.dto';
 import { UserUpdateDto } from './dto/user.update.dto';
 import { UserService } from './user.service';
-import { Pagination } from 'src/common/interfaces.ts/paginations.interface';
+import { Pagination } from 'src/common/interfaces/paginations.interface';
 
 @Controller('user')
 export class UserController {

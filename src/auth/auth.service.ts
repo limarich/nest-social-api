@@ -3,13 +3,14 @@ import { IAuthService } from './interface/IAuthService';
 import { UserLoginDto } from './dto/UserLoginDto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import * as argon from "argon2";
 import { BadRequestException } from '@nestjs/common';
 import { User, UserWithoutPassword } from '../user/interface/user.interface';
+import { AbstractHashService } from 'src/common/interfaces/hash.interface';
 
 @Injectable()
 export class AuthService implements IAuthService {
     constructor(@InjectRepository(User) readonly userRepository: Repository<User>,
+        readonly hashService: AbstractHashService
     ) { }
     async login(dto: UserLoginDto): Promise<UserWithoutPassword> {
         const user = await this.userRepository.findOneBy({ email: dto.email });
@@ -18,7 +19,7 @@ export class AuthService implements IAuthService {
             throw new BadRequestException(`Email or password is not valid, please try again`);
         }
 
-        const isPasswordValid = await argon.verify(user.password, dto.password);
+        const isPasswordValid = await this.hashService.verify(user.password, dto.password);
 
         if (!isPasswordValid) {
             throw new BadRequestException(`Email or password is not valid, please try again`);
