@@ -3,32 +3,28 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from 'src/user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigType } from '@nestjs/config';
 import { AuthModule } from 'src/auth/auth.module';
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { AllExceptionsFilter } from 'src/common/filters/all-exceptions.filter';
 import { LoggerModule } from 'nestjs-pino';
 import { EnvSchema } from 'src/common/schemas/type-orm.schema';
 import { HashModule } from 'src/common/utils/hash/hash.module';
+import databaseConfig from 'src/common/config/database.config';
 
 @Module({
   imports: [
     // load .env file globally
     ConfigModule.forRoot({
       isGlobal: true,
+      load: [databaseConfig],
       validationSchema: EnvSchema
     }),
     TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host: config.get<string>('DB_HOST'),
-        port: config.get<number>('DB_PORT'),
-        username: config.get<string>('DB_USER'),
-        password: config.get<string>('DB_PASSWORD'),
-        database: config.get<string>('DB_NAME'),
-        autoLoadEntities: true,
-        synchronize: config.get('NODE_ENV') === 'development',
+      imports: [ConfigModule],
+      inject: [databaseConfig.KEY],
+      useFactory: (config: ConfigType<typeof databaseConfig>) => ({
+        ...config,
       }),
     }),
     LoggerModule.forRoot({
