@@ -35,5 +35,3 @@ export class User {
     @UpdateDateColumn()
     readonly updatedAt?: Date;
 }
-
-export interface UserWithoutPassword extends Omit<User, 'password'> { }

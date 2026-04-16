@@ -1,10 +1,11 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { User, UserRole, UserWithoutPassword } from './interface/user.interface';
+import { User, UserRole } from './entity/user.entity';
 import { UserCreateDto } from './dto/user.create.dto';
 import { UserUpdateDto } from './dto/user.update.dto';
 import { IUserService } from './interface/user.service.interface';
 import * as argon from "argon2";
 import { Pagination } from 'src/common/interfaces/paginations.interface';
+import { UserResponseDto } from './dto/user.response.dto';
 
 export const EMAIL_ADDRESS = "test@gmail.com";
 
@@ -31,18 +32,18 @@ export class UserServiceMock implements IUserService {
         return user;
     }
 
-    async findOne(id: string): Promise<UserWithoutPassword> {
+    async findOne(id: string): Promise<UserResponseDto> {
         const user = this.users.find(user => user.id === id);
 
         if (!user) {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
 
-        const { password, ...userWithoutPassword } = user;
-        return userWithoutPassword;
+        const { password, ...userResponse } = user;
+        return userResponse;
     }
 
-    async findAll(pagination: Pagination = {}): Promise<UserWithoutPassword[]> {
+    async findAll(pagination: Pagination = {}): Promise<UserResponseDto[]> {
         const { page = 1, limit = 10 } = pagination;
 
         const skip = (page - 1) * limit;
@@ -51,12 +52,12 @@ export class UserServiceMock implements IUserService {
         const users = this.users.slice(skip, skip + take);
 
         return users.map(user => {
-            const { password, ...userWithoutPassword } = user;
-            return userWithoutPassword;
+            const { password, ...userResponse } = user;
+            return userResponse;
         })
     }
 
-    async create(user: UserCreateDto): Promise<UserWithoutPassword> {
+    async create(user: UserCreateDto): Promise<UserResponseDto> {
         const userAlreadyExists = await this.findByEmail(user.email);
 
         if (userAlreadyExists) {
@@ -71,12 +72,12 @@ export class UserServiceMock implements IUserService {
             role: UserRole.USER
         }
         this.users.push(newUser);
-        const { password, ...userWithoutPassword } = newUser;
+        const { password, ...userResponse } = newUser;
 
-        return userWithoutPassword;
+        return userResponse;
     }
 
-    async update(user: UserUpdateDto): Promise<UserWithoutPassword> {
+    async update(user: UserUpdateDto): Promise<UserResponseDto> {
 
         const userIndex = this.users.findIndex(existingUser => existingUser.id === user.id);
 
@@ -100,9 +101,9 @@ export class UserServiceMock implements IUserService {
 
         this.users[userIndex] = updatedUser;
 
-        const { password, ...userWithoutPassword } = updatedUser;
+        const { password, ...userResponse } = updatedUser;
 
-        return userWithoutPassword;
+        return userResponse;
     }
 
     async remove(id: string): Promise<void> {

@@ -2,18 +2,19 @@ import { ConflictException, Injectable, NotFoundException } from "@nestjs/common
 import { IUserService } from "./interface/user.service.interface";
 import { UserCreateDto } from "./dto/user.create.dto";
 import { UserUpdateDto } from "./dto/user.update.dto";
-import { User, UserWithoutPassword } from "./interface/user.interface";
+import { UserResponseDto } from "./dto/user.response.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Pagination } from "src/common/interfaces/paginations.interface";
 import { AbstractHashService } from "src/common/interfaces/hash.interface";
+import { User } from "./entity/user.entity";
 
 @Injectable()
 export class UserService implements IUserService {
     constructor(@InjectRepository(User) readonly userRepository: Repository<User>,
         readonly hashService: AbstractHashService) { }
 
-    async findAll(pagination: Pagination = {}): Promise<UserWithoutPassword[]> {
+    async findAll(pagination: Pagination = {}): Promise<UserResponseDto[]> {
         const { page = 1, limit = 10 } = pagination;
         const users = await this.userRepository.find({
             skip: (page - 1) * limit,
@@ -30,23 +31,23 @@ export class UserService implements IUserService {
         })
         return users;
     }
-    async findOne(id: string): Promise<UserWithoutPassword> {
+    async findOne(id: string): Promise<UserResponseDto> {
         const user = await this.userRepository.findOneBy({ id });
 
         if (!user) {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
 
-        const { password, ...userWithoutPassword } = user;
+        const { password, ...userResponse } = user;
 
-        return userWithoutPassword;
+        return userResponse;
     }
-    async create(dto: UserCreateDto): Promise<UserWithoutPassword> {
+    async create(dto: UserCreateDto): Promise<UserResponseDto> {
         try {
             const hash = await this.hashService.hash(dto.password);
             const user = await this.userRepository.save({ ...dto, password: hash });
-            const { password, ...userWithoutPassword } = user;
-            return userWithoutPassword;
+            const { password, ...userResponse } = user;
+            return userResponse;
         }
         catch (error) {
             if (error.code === '23505') {
@@ -55,7 +56,7 @@ export class UserService implements IUserService {
             throw error;
         }
     }
-    async update(dto: UserUpdateDto): Promise<UserWithoutPassword> {
+    async update(dto: UserUpdateDto): Promise<UserResponseDto> {
         try {
             const existingUser = await this.userRepository.findOneBy({ id: dto.id });
             if (!existingUser) {
@@ -74,8 +75,8 @@ export class UserService implements IUserService {
                 }
             }
             const user = await this.userRepository.save(updatedUser);
-            const { password, ...userWithoutPassword } = user;
-            return userWithoutPassword;
+            const { password, ...userResponse } = user;
+            return userResponse;
         } catch (error) {
             if (error.code === '23505') {
                 throw new ConflictException(`User with email ${dto.email} already exists`);

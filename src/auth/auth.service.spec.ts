@@ -31,4 +31,9 @@ describe('AuthService', () => {
   it('should not login a user', async () => {
     await expect(service.login({ email: 'invalid-email', password: 'password' })).rejects.toThrow(BadRequestException);
   })
+
+  it('should return a token', async () => {
+    const user = await service.login({ email: EMAIL_ADDRESS, password: 'password' });
+    expect(user.access_token).toBeDefined();
+  })
 });

@@ -1,6 +1,6 @@
 import { UserLoginDto } from "../dto/UserLoginDto";
-import { UserWithoutPassword } from "src/user/interface/user.interface";
+import { UserResponseDto } from "src/user/dto/user.response.dto";
 
 export interface IAuthService {
-    login(dto: UserLoginDto): Promise<UserWithoutPassword>;
+    login(dto: UserLoginDto): Promise<{ user: UserResponseDto, access_token: string }>;
 }

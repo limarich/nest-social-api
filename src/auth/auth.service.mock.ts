@@ -2,13 +2,13 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { IAuthService } from './interface/IAuthService';
 import { UserServiceMock } from 'src/user/user.service.mock';
 import { UserLoginDto } from './dto/UserLoginDto';
-import { UserWithoutPassword } from 'src/user/interface/user.interface';
 import * as argon from "argon2";
+import { LoginResponseDto } from './dto/login.reponse.dto';
 
 @Injectable()
 export class AuthServiceMock extends UserServiceMock implements IAuthService {
 
-    async login(dto: UserLoginDto): Promise<UserWithoutPassword> {
+    async login(dto: UserLoginDto): Promise<LoginResponseDto> {
         const user = await this.findByEmail(dto.email);
         if (!user) {
             throw new BadRequestException(`Email or password is not valid, please try again`);
@@ -20,7 +20,7 @@ export class AuthServiceMock extends UserServiceMock implements IAuthService {
             throw new BadRequestException(`Email or password is not valid, please try again`);
         }
 
-        const { password, ...userWithoutPassword } = user;
-        return userWithoutPassword;
+        const { password, ...userResponseDto } = user;
+        return { user: userResponseDto, access_token: "token" };
     }
 }
