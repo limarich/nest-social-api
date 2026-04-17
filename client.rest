@@ -1,16 +1,21 @@
 @baseUrl = http://localhost:3000
+@token = {{user_login.response.body.access_token}}
+@userId = {{user_login.response.body.user.id}}
 
 ### List Users
 GET {{baseUrl}}/user?page=1&limit=10
+Authorization: Bearer {{token}}
 
 ### Find User
 
-GET {{baseUrl}}/user/1
+GET {{baseUrl}}/user/{{userId}}
+Authorization: Bearer {{token}}
 
 ### Create New User
 
 POST {{baseUrl}}/user/ 
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
     "name": "John",
@@ -22,6 +27,7 @@ Content-Type: application/json
 
 PUT  {{baseUrl}}/user
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
     "id": "cb76f931-a491-4631-a871-888fa94aa330",
@@ -31,11 +37,12 @@ Content-Type: application/json
 } 
 
 ### Delete User
-
+Authorization: Bearer {{token}}
 DELETE {{baseUrl}}/user/cb76f931-a491-4631-a871-888fa94aa330
 
 
 ### User login 
+# @name user_login
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
