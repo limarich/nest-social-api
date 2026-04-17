@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { IUserService } from "./interface/user.service.interface";
 import { UserCreateDto } from "./dto/user.create.dto";
 import { UserUpdateDto } from "./dto/user.update.dto";
@@ -56,11 +56,15 @@ export class UserService implements IUserService {
             throw error;
         }
     }
-    async update(dto: UserUpdateDto): Promise<UserResponseDto> {
+    async update(dto: UserUpdateDto, userId: string): Promise<UserResponseDto> {
         try {
             const existingUser = await this.userRepository.findOneBy({ id: dto.id });
+
             if (!existingUser) {
-                throw new NotFoundException(`User with ID ${dto.id} not found`);
+                throw new NotFoundException(`User not found`);
+            }
+            if (existingUser.id !== userId) {
+                throw new UnauthorizedException(`You can't update another user`);
             }
             const updatedUser = { ...existingUser, ...dto };
 
@@ -84,7 +88,15 @@ export class UserService implements IUserService {
             throw error;
         }
     }
-    async remove(id: string): Promise<void> {
+    async remove(id: string, userId: string): Promise<void> {
+        const existingUser = await this.userRepository.findOneBy({ id });
+
+        if (!existingUser) {
+            throw new NotFoundException(`User not found`);
+        }
+        if (existingUser.id !== userId) {
+            throw new UnauthorizedException(`You can't delete another user`);
+        }
         const result = await this.userRepository.delete(id);
         if (result.affected === 0) {
             throw new NotFoundException(`User with ID ${id} not found`);

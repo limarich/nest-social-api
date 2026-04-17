@@ -37,7 +37,7 @@ describe('UserController', () => {
   it('should not update a user with an existing email', async () => {
     await expect(controller.update({
       id: "abc-123", name: 'John', email: 'existing@gmail.com', password: 'password'
-    })).rejects.toThrow(ConflictException);
+    }, 'abc-123')).rejects.toThrow(ConflictException);
   });
 
 });

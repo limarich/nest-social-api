@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { User, UserRole } from './entity/user.entity';
 import { UserCreateDto } from './dto/user.create.dto';
 import { UserUpdateDto } from './dto/user.update.dto';
@@ -23,7 +23,16 @@ export class UserServiceMock implements IUserService {
             createdAt: new Date(),
             updatedAt: new Date(),
             role: UserRole.USER
-        })
+        },
+            {
+                email: "email2@gmail.com",
+                id: 'def-456',
+                name: 'John',
+                password: password,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                role: UserRole.USER
+            })
 
     }
 
@@ -77,12 +86,15 @@ export class UserServiceMock implements IUserService {
         return userResponse;
     }
 
-    async update(user: UserUpdateDto): Promise<UserResponseDto> {
+    async update(user: UserUpdateDto, userId: string): Promise<UserResponseDto> {
 
         const userIndex = this.users.findIndex(existingUser => existingUser.id === user.id);
 
         if (userIndex === -1) {
             throw new NotFoundException(`User with ID ${user.id} not found`);
+        }
+        if (this.users[userIndex].id !== userId) {
+            throw new UnauthorizedException(`You can't update another user`);
         }
 
         if (user.email) {
@@ -106,11 +118,14 @@ export class UserServiceMock implements IUserService {
         return userResponse;
     }
 
-    async remove(id: string): Promise<void> {
+    async remove(id: string, userId: string): Promise<void> {
         const userIndex = this.users.findIndex(user => user.id === id);
 
         if (userIndex === -1) {
             throw new NotFoundException(`User with ID ${id} not found`);
+        }
+        if (this.users[userIndex].id !== userId) {
+            throw new UnauthorizedException(`You can't delete another user`);
         }
 
         this.users.splice(userIndex, 1);

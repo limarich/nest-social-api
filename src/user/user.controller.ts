@@ -3,6 +3,7 @@ import { UserCreateDto } from './dto/user.create.dto';
 import { UserUpdateDto } from './dto/user.update.dto';
 import { UserService } from './user.service';
 import { Pagination } from 'src/common/interfaces/paginations.interface';
+import { TokenPayload } from 'src/common/decorators/token_payload.decorator';
 
 @Controller('user')
 export class UserController {
@@ -24,12 +25,12 @@ export class UserController {
     }
 
     @Put()
-    update(@Body() user: UserUpdateDto) {
-        return this.userService.update(user);
+    update(@Body() user: UserUpdateDto, @TokenPayload('sub') userId: string) {
+        return this.userService.update(user, userId);
     }
 
     @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.userService.remove(id);
+    remove(@Param('id') id: string, @TokenPayload('sub') userId: string) {
+        return this.userService.remove(id, userId);
     }
 }

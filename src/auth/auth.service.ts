@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { IAuthService } from './interface/IAuthService';
-import { UserLoginDto } from './dto/UserLoginDto';
+import { UserLoginDto } from './dto/user_login.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BadRequestException } from '@nestjs/common';

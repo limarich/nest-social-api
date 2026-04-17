@@ -7,6 +7,6 @@ export interface IUserService {
     findAll(pagination?: Pagination): Promise<UserResponseDto[]>;
     findOne(id: string): Promise<UserResponseDto>;
     create(dto: UserCreateDto): Promise<UserResponseDto>;
-    update(dto: UserUpdateDto): Promise<UserResponseDto>;
-    remove(id: string): Promise<void>;
+    update(dto: UserUpdateDto, userId: string): Promise<UserResponseDto>;
+    remove(id: string, userId: string): Promise<void>;
 }

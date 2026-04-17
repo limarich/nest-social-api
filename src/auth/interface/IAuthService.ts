@@ -1,4 +1,4 @@
-import { UserLoginDto } from "../dto/UserLoginDto";
+import { UserLoginDto } from "../dto/user_login.dto";
 import { UserResponseDto } from "src/user/dto/user.response.dto";
 
 export interface IAuthService {

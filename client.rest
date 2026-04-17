@@ -30,7 +30,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "id": "cb76f931-a491-4631-a871-888fa94aa330",
+    "id": "8f56ce28-72d1-489c-8956-660d97830441",
     "name": "John",
     "email": "richard.esclima@gmail.com",
     "password": "password"

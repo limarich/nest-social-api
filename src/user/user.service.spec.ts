@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { EMAIL_ADDRESS, UserServiceMock } from './user.service.mock';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 
 describe('UserService', () => {
   let service: UserServiceMock;
@@ -37,23 +37,33 @@ describe('UserService', () => {
   it('should update a user', async () => {
     const user = await service.update({
       id: 'abc-123', name: 'John', email: EMAIL_ADDRESS, password: 'password'
-    });
+    }, 'abc-123');
     expect(user).toBeDefined();
   });
 
   it('should not update a user', async () => {
     await expect(service.update({
       id: 'abc-1234', name: 'John', email: EMAIL_ADDRESS, password: 'password'
-    })).rejects.toThrow(NotFoundException);
+    }, 'abc-123')).rejects.toThrow(NotFoundException);
+  })
+
+  it('should not update a different user', async () => {
+    await expect(service.update({
+      id: 'def-456', name: 'John', email: 'email2@gmail.com', password: 'password'
+    }, 'abc-123')).rejects.toThrow(UnauthorizedException);
   })
 
   it('should delete a user', async () => {
-    const user = await service.remove('abc-123');
+    const user = await service.remove('abc-123', 'abc-123');
     expect(user).toBeUndefined();
   });
 
   it('should not delete a user', async () => {
-    await expect(service.remove('abc-1234')).rejects.toThrow(NotFoundException);
+    await expect(service.remove('abc-1234', 'abc-123')).rejects.toThrow(NotFoundException);
+  })
+
+  it('should not delete a different user', async () => {
+    await expect(service.remove('abc-123', 'def-456')).rejects.toThrow(UnauthorizedException);
   })
 
   it('should find a user', async () => {

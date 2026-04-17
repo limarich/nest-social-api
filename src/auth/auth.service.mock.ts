@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { IAuthService } from './interface/IAuthService';
 import { UserServiceMock } from 'src/user/user.service.mock';
-import { UserLoginDto } from './dto/UserLoginDto';
+import { UserLoginDto } from './dto/user_login.dto';
 import * as argon from "argon2";
 import { LoginResponseDto } from './dto/login.reponse.dto';
 
