@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { IAuthService } from './interface/IAuthService';
 import { UserLoginDto } from './dto/user_login.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -43,7 +43,7 @@ export class AuthService implements IAuthService {
             this.signToken(user.id, user.email, TokenType.ACCESS),
             this.signToken(user.id, user.email, TokenType.REFRESH),
         ]);
-        const { hashed_password, ...userResponse } = user;
+        const { hashed_password, hashed_refresh_token: _oldToken, ...userResponse } = user;
 
         const hashed_refresh_token = await this.hashService.hash(refresh_token);
 
@@ -53,42 +53,41 @@ export class AuthService implements IAuthService {
     }
 
     async refreshToken(dto: RefreshTokenDto): Promise<RefreshTokenResponseDto> {
+        let decodedToken: { sub: string; type: string };
         try {
-            const decodedToken = await this.jwtService.verifyAsync(dto.refresh_token, {
+            decodedToken = await this.jwtService.verifyAsync(dto.refresh_token, {
                 audience: this.jwtConfiguration.audience,
                 issuer: this.jwtConfiguration.issuer,
             });
-
-            if (decodedToken.type !== TokenType.REFRESH) {
-                throw new BadRequestException(`Invalid refresh token`);
-            }
-
-            const user = await this.userRepository.findOneBy({ id: decodedToken.sub });
-
-            if (!user || !user.hashed_refresh_token) {
-                throw new BadRequestException(`Invalid refresh token`);
-            }
-
-            const isRefreshTokenValid = await this.hashService.verify(user.hashed_refresh_token, dto.refresh_token);
-
-            if (!isRefreshTokenValid) {
-                throw new BadRequestException(`Invalid refresh token`);
-            }
-
-            const [access_token, refresh_token] = await Promise.all([
-                this.signToken(user.id, user.email, TokenType.ACCESS),
-                this.signToken(user.id, user.email, TokenType.REFRESH),
-            ]);
-
-            const hashed_refresh_token = await this.hashService.hash(refresh_token);
-
-            await this.userRepository.update(user.id, { hashed_refresh_token });
-
-            return { access_token, refresh_token };
+        } catch {
+            throw new UnauthorizedException(`Invalid refresh token`);
         }
-        catch (error) {
-            throw new BadRequestException(`Invalid refresh token`);
+
+        if (decodedToken.type !== TokenType.REFRESH) {
+            throw new UnauthorizedException(`Invalid refresh token`);
         }
+
+        const user = await this.userRepository.findOneBy({ id: decodedToken.sub });
+
+        if (!user || !user.hashed_refresh_token) {
+            throw new UnauthorizedException(`Invalid refresh token`);
+        }
+
+        const isRefreshTokenValid = await this.hashService.verify(user.hashed_refresh_token, dto.refresh_token);
+
+        if (!isRefreshTokenValid) {
+            throw new UnauthorizedException(`Invalid refresh token`);
+        }
+
+        const [access_token, refresh_token] = await Promise.all([
+            this.signToken(user.id, user.email, TokenType.ACCESS),
+            this.signToken(user.id, user.email, TokenType.REFRESH),
+        ]);
+
+        const hashed_refresh_token = await this.hashService.hash(refresh_token);
+        await this.userRepository.update(user.id, { hashed_refresh_token });
+
+        return { access_token, refresh_token };
     }
 
 
