@@ -33,7 +33,7 @@ export class AuthService implements IAuthService {
             throw new BadRequestException(`Email or password is not valid, please try again`);
         }
 
-        const isPasswordValid = await this.hashService.verify(user.hashed_password, dto.password);
+        const isPasswordValid = await this.hashService.verify(user.hashedPassword, dto.password);
 
         if (!isPasswordValid) {
             throw new BadRequestException(`Email or password is not valid, please try again`);
@@ -43,11 +43,11 @@ export class AuthService implements IAuthService {
             this.signToken(user.id, user.email, TokenType.ACCESS, user.role),
             this.signToken(user.id, user.email, TokenType.REFRESH, user.role),
         ]);
-        const { hashed_password, hashed_refresh_token: _oldToken, ...userResponse } = user;
+        const { hashedPassword, hashedRefreshToken: _oldToken, ...userResponse } = user;
 
-        const hashed_refresh_token = await this.hashService.hash(refresh_token);
+        const hashedRefreshToken = await this.hashService.hash(refresh_token);
 
-        await this.userRepository.update(user.id, { hashed_refresh_token });
+        await this.userRepository.update(user.id, { hashedRefreshToken });
 
         return { user: userResponse, access_token, refresh_token };
     }
@@ -69,11 +69,11 @@ export class AuthService implements IAuthService {
 
         const user = await this.userRepository.findOneBy({ id: decodedToken.sub });
 
-        if (!user || !user.hashed_refresh_token) {
+        if (!user || !user.hashedRefreshToken) {
             throw new UnauthorizedException(`Invalid refresh token`);
         }
 
-        const isRefreshTokenValid = await this.hashService.verify(user.hashed_refresh_token, dto.refresh_token);
+        const isRefreshTokenValid = await this.hashService.verify(user.hashedRefreshToken, dto.refresh_token);
 
         if (!isRefreshTokenValid) {
             throw new UnauthorizedException(`Invalid refresh token`);
@@ -84,8 +84,8 @@ export class AuthService implements IAuthService {
             this.signToken(user.id, user.email, TokenType.REFRESH, user.role),
         ]);
 
-        const hashed_refresh_token = await this.hashService.hash(refresh_token);
-        await this.userRepository.update(user.id, { hashed_refresh_token });
+        const hashedRefreshToken = await this.hashService.hash(refresh_token);
+        await this.userRepository.update(user.id, { hashedRefreshToken });
 
         return { access_token, refresh_token };
     }

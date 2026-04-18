@@ -14,9 +14,9 @@ export class User {
     @Column()
     readonly email: string;
 
-    @Column()
+    @Column({ name: 'hashed_password' })
     @Exclude()
-    readonly hashed_password: string;
+    readonly hashedPassword: string;
 
     @Column({
         type: "enum",
@@ -31,7 +31,7 @@ export class User {
     @UpdateDateColumn()
     readonly updatedAt?: Date;
 
-    @Column({ nullable: true })
+    @Column({ name: 'hashed_refresh_token', nullable: true })
     @Exclude()
-    readonly hashed_refresh_token?: string;
+    readonly hashedRefreshToken?: string;
 }

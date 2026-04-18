@@ -18,7 +18,7 @@ export class AuthServiceMock extends UserServiceMock implements IAuthService {
             throw new BadRequestException(`Email or password is not valid, please try again`);
         }
 
-        const isPasswordValid = await argon.verify(user.hashed_password, dto.password);
+        const isPasswordValid = await argon.verify(user.hashedPassword, dto.password);
 
         if (!isPasswordValid) {
             throw new BadRequestException(`Email or password is not valid, please try again`);
@@ -27,7 +27,7 @@ export class AuthServiceMock extends UserServiceMock implements IAuthService {
         const refresh_token = this.generateToken();
         await this.saveRefreshToken(user.id, refresh_token);
 
-        const { hashed_password, ...userResponseDto } = user;
+        const { hashedPassword, ...userResponseDto } = user;
         return { user: userResponseDto, access_token: "access_token", refresh_token };
     }
 

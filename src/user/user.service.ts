@@ -22,8 +22,8 @@ export class UserService implements IUserService {
             select: {
                 id: true,
                 name: true,
-                hashed_password: false,
-                hashed_refresh_token: false,
+                hashedPassword: false,
+                hashedRefreshToken: false,
                 role: true,
                 email: true,
                 createdAt: true,
@@ -39,15 +39,15 @@ export class UserService implements IUserService {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
 
-        const { hashed_password, hashed_refresh_token, ...userResponse } = user;
+        const { hashedPassword, hashedRefreshToken, ...userResponse } = user;
 
         return userResponse;
     }
     async create(dto: UserCreateDto): Promise<UserResponseDto> {
         try {
             const hash = await this.hashService.hash(dto.password);
-            const user = await this.userRepository.save({ ...dto, hashed_password: hash });
-            const { hashed_password, hashed_refresh_token, ...userResponse } = user;
+            const user = await this.userRepository.save({ ...dto, hashedPassword: hash });
+            const { hashedPassword, hashedRefreshToken, ...userResponse } = user;
             return userResponse;
         }
         catch (error) {
@@ -71,7 +71,7 @@ export class UserService implements IUserService {
 
             if (dto.password) {
                 const hash = await this.hashService.hash(dto.password);
-                updatedUser.hashed_password = hash;
+                updatedUser.hashedPassword = hash;
             }
             if (dto.email) {
                 const userWithEmail = await this.userRepository.findOneBy({ email: dto.email });
@@ -80,7 +80,7 @@ export class UserService implements IUserService {
                 }
             }
             const user = await this.userRepository.save(updatedUser);
-            const { hashed_password, hashed_refresh_token, ...userResponse } = user;
+            const { hashedPassword, hashedRefreshToken, ...userResponse } = user;
             return userResponse;
         } catch (error) {
             if (error.code === '23505') {
