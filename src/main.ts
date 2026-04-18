@@ -10,6 +10,7 @@ async function bootstrap() {
 
   app.useLogger(app.get(Logger));
   app.use(helmet());
+  app.enableCors(); // TODO: Configure CORS properly if needed
 
   await app.listen(process.env.PORT ?? 3000);
 }
