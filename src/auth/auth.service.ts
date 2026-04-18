@@ -33,7 +33,7 @@ export class AuthService implements IAuthService {
             throw new BadRequestException(`Email or password is not valid, please try again`);
         }
 
-        const isPasswordValid = await this.hashService.verify(user.password, dto.password);
+        const isPasswordValid = await this.hashService.verify(user.hashed_password, dto.password);
 
         if (!isPasswordValid) {
             throw new BadRequestException(`Email or password is not valid, please try again`);
@@ -43,7 +43,11 @@ export class AuthService implements IAuthService {
             this.signToken(user.id, user.email, TokenType.ACCESS),
             this.signToken(user.id, user.email, TokenType.REFRESH),
         ]);
-        const { password, ...userResponse } = user;
+        const { hashed_password, ...userResponse } = user;
+
+        const hashed_refresh_token = await this.hashService.hash(refresh_token);
+
+        await this.userRepository.update(user.id, { hashed_refresh_token });
 
         return { user: userResponse, access_token, refresh_token };
     }
@@ -61,12 +65,24 @@ export class AuthService implements IAuthService {
 
             const user = await this.userRepository.findOneBy({ id: decodedToken.sub });
 
-            if (!user) {
-                throw new BadRequestException(`User not found`);
+            if (!user || !user.hashed_refresh_token) {
+                throw new BadRequestException(`Invalid refresh token`);
             }
 
-            const access_token = await this.signToken(user.id, user.email, TokenType.ACCESS);
-            const refresh_token = await this.signToken(user.id, user.email, TokenType.REFRESH);
+            const isRefreshTokenValid = await this.hashService.verify(user.hashed_refresh_token, dto.refresh_token);
+
+            if (!isRefreshTokenValid) {
+                throw new BadRequestException(`Invalid refresh token`);
+            }
+
+            const [access_token, refresh_token] = await Promise.all([
+                this.signToken(user.id, user.email, TokenType.ACCESS),
+                this.signToken(user.id, user.email, TokenType.REFRESH),
+            ]);
+
+            const hashed_refresh_token = await this.hashService.hash(refresh_token);
+
+            await this.userRepository.update(user.id, { hashed_refresh_token });
 
             return { access_token, refresh_token };
         }

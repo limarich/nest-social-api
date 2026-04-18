@@ -19,19 +19,21 @@ export class UserServiceMock implements IUserService {
             email: EMAIL_ADDRESS,
             id: 'abc-123',
             name: 'Richard',
-            password: password,
+            hashed_password: password,
             createdAt: new Date(),
             updatedAt: new Date(),
-            role: UserRole.USER
+            role: UserRole.USER,
+            hashed_refresh_token: ""
         },
             {
                 email: "email2@gmail.com",
                 id: 'def-456',
                 name: 'John',
-                password: password,
+                hashed_password: password,
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                role: UserRole.USER
+                role: UserRole.USER,
+                hashed_refresh_token: ""
             })
 
     }
@@ -48,7 +50,7 @@ export class UserServiceMock implements IUserService {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
 
-        const { password, ...userResponse } = user;
+        const { hashed_password, hashed_refresh_token, ...userResponse } = user;
         return userResponse;
     }
 
@@ -61,7 +63,7 @@ export class UserServiceMock implements IUserService {
         const users = this.users.slice(skip, skip + take);
 
         return users.map(user => {
-            const { password, ...userResponse } = user;
+            const { hashed_password, hashed_refresh_token, ...userResponse } = user;
             return userResponse;
         })
     }
@@ -78,10 +80,11 @@ export class UserServiceMock implements IUserService {
             id: "abc-123",
             createdAt: new Date(),
             updatedAt: new Date(),
-            role: UserRole.USER
+            role: UserRole.USER,
+            hashed_password: ''
         }
         this.users.push(newUser);
-        const { password, ...userResponse } = newUser;
+        const { hashed_password, hashed_refresh_token, ...userResponse } = newUser;
 
         return userResponse;
     }
@@ -113,9 +116,19 @@ export class UserServiceMock implements IUserService {
 
         this.users[userIndex] = updatedUser;
 
-        const { password, ...userResponse } = updatedUser;
+        const { hashed_password, hashed_refresh_token, ...userResponse } = updatedUser;
 
         return userResponse;
+    }
+
+    async saveRefreshToken(userId: string, token: string): Promise<void> {
+        const userIndex = this.users.findIndex(u => u.id === userId);
+        if (userIndex === -1) throw new NotFoundException(`User with ID ${userId} not found`);
+        this.users[userIndex] = { ...this.users[userIndex], hashed_refresh_token: token };
+    }
+
+    async findByRefreshToken(token: string): Promise<User | undefined> {
+        return this.users.find(u => u.hashed_refresh_token === token);
     }
 
     async remove(id: string, userId: string): Promise<void> {

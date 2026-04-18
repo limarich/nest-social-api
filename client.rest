@@ -1,10 +1,11 @@
 @baseUrl = http://localhost:3000
 @token = {{user_login.response.body.access_token}}
+@refreshed_token = {{refresh_token.response.body.access_token}}
 @userId = {{user_login.response.body.user.id}}
 
 ### List Users
 GET {{baseUrl}}/user?page=1&limit=10
-Authorization: Bearer {{token}}
+Authorization: Bearer {{refreshed_token}}
 
 ### Find User
 
@@ -19,7 +20,7 @@ Authorization: Bearer {{token}}
 
 {
     "name": "John",
-    "email": "richard1234.teste@gmail.com",
+    "email": "richard1.teste@gmail.com",
     "password": "password"
 } 
 
@@ -47,7 +48,7 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-    "email": "richard.esclima@gmail.com",
+    "email": "richard1.teste@gmail.com",
     "password": "password"
 }
 

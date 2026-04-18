@@ -20,7 +20,7 @@ export class User {
 
     @Column()
     @Exclude()
-    readonly password: string;
+    readonly hashed_password: string;
 
     @Column({
         type: "enum",
@@ -34,4 +34,8 @@ export class User {
 
     @UpdateDateColumn()
     readonly updatedAt?: Date;
+
+    @Column({ nullable: true })
+    @Exclude()
+    readonly hashed_refresh_token?: string;
 }
