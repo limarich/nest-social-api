@@ -13,6 +13,11 @@ import { LoginResponseDto } from './dto/login.reponse.dto';
 import { RefreshTokenResponseDto } from './dto/refresh_token.reponse.dto';
 import { RefreshTokenDto } from './dto/refresh_token.dto';
 
+enum TokenType {
+    ACCESS = 'access',
+    REFRESH = 'refresh',
+}
+
 @Injectable()
 export class AuthService implements IAuthService {
     constructor(@InjectRepository(User) readonly userRepository: Repository<User>,
@@ -35,8 +40,8 @@ export class AuthService implements IAuthService {
         }
 
         const [access_token, refresh_token] = await Promise.all([
-            this.signToken(user),
-            this.signToken(user, this.jwtConfiguration.refresh_ttl),
+            this.signToken(user.id, user.email, TokenType.ACCESS),
+            this.signToken(user.id, user.email, TokenType.REFRESH),
         ]);
         const { password, ...userResponse } = user;
 
@@ -50,14 +55,18 @@ export class AuthService implements IAuthService {
                 issuer: this.jwtConfiguration.issuer,
             });
 
+            if (decodedToken.type !== TokenType.REFRESH) {
+                throw new BadRequestException(`Invalid refresh token`);
+            }
+
             const user = await this.userRepository.findOneBy({ id: decodedToken.sub });
 
             if (!user) {
                 throw new BadRequestException(`User not found`);
             }
 
-            const access_token = await this.signToken(user);
-            const refresh_token = await this.signToken(user, this.jwtConfiguration.refresh_ttl);
+            const access_token = await this.signToken(user.id, user.email, TokenType.ACCESS);
+            const refresh_token = await this.signToken(user.id, user.email, TokenType.REFRESH);
 
             return { access_token, refresh_token };
         }
@@ -66,12 +75,15 @@ export class AuthService implements IAuthService {
         }
     }
 
-    private async signToken(user: User, expiresIn?: number) {
+
+
+    private async signToken(sub: string, email: string, type: TokenType) {
         return await this.jwtService.signAsync({
-            sub: user.id,
-            email: user.email,
+            sub,
+            email,
+            type
         }, {
-            expiresIn: expiresIn ?? this.jwtConfiguration.ttl,
+            expiresIn: type === TokenType.ACCESS ? this.jwtConfiguration.ttl : this.jwtConfiguration.refresh_ttl,
             audience: this.jwtConfiguration.audience,
             issuer: this.jwtConfiguration.issuer,
         });
