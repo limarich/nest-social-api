@@ -13,7 +13,7 @@ const mockJwtConfig = {
     ttl: 3600,
 };
 
-const mockPayload = { sub: 'user-id', email: 'user@test.com' };
+const mockPayload = { sub: 'user-id', email: 'user@test.com', type: 'access' };
 
 const createMockContext = (token?: string): ExecutionContext => {
     const request: Record<string, any> = {
@@ -89,6 +89,15 @@ describe('AuthGuard', () => {
         it('deve lançar UnauthorizedException quando o token é inválido', async () => {
             jwtService.verifyAsync.mockRejectedValue(new Error('invalid token'));
             const context = createMockContext('invalid.token.here');
+
+            await expect(guard.canActivate(context)).rejects.toThrow(
+                new UnauthorizedException('Invalid token'),
+            );
+        });
+
+        it('deve lançar UnauthorizedException quando o token é do tipo refresh', async () => {
+            jwtService.verifyAsync.mockResolvedValue({ ...mockPayload, type: 'refresh' });
+            const context = createMockContext('refresh.token.here');
 
             await expect(guard.canActivate(context)).rejects.toThrow(
                 new UnauthorizedException('Invalid token'),
