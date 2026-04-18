@@ -2,8 +2,8 @@ import { registerAs } from "@nestjs/config";
 
 export default registerAs('jwt', () => ({
     secret: process.env.JWT_SECRET ?? (() => { throw new Error('JWT_SECRET is not defined') })(),
-    audience: process.env.JWT_TOKEN_AUDIENCE,
-    issuer: process.env.JWT_TOKEN_ISSUER,
+    audience: process.env.JWT_TOKEN_AUDIENCE ?? (() => { throw new Error('JWT_TOKEN_AUDIENCE is not defined') })(),
+    issuer: process.env.JWT_TOKEN_ISSUER ?? (() => { throw new Error('JWT_TOKEN_ISSUER is not defined') })(),
     ttl: Number(process.env.JWT_TTL ?? 3600),
     refresh_ttl: Number(process.env.JWT_REFRESH_TTL ?? 86400),
 }))

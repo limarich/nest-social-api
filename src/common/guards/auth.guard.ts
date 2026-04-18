@@ -39,6 +39,10 @@ export class AuthGuard implements CanActivate {
                     issuer: this.jwtConfiguration.issuer,
                 }
             );
+            if (payload.type !== 'access') {
+                throw new UnauthorizedException('Invalid token');
+            }
+
             request[REQUEST_TOKEN_PAYLOAD_KEY] = payload;
 
             return true;

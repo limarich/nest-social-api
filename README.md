@@ -43,9 +43,16 @@ API REST para uma rede social simples com suporte a postagens, comentários e si
 
 ### Segurança
 
-- Senhas devem ser armazenadas com hash (bcrypt)
-- Autenticação via JWT com tempo de expiração configurável
-- Rotas protegidas devem rejeitar requisições sem token válido com HTTP 401
+- Senhas armazenadas com hash **Argon2** (resistente a GPU/ASIC attacks)
+- Refresh tokens armazenados com hash Argon2 no banco — tokens em plaintext nunca são persistidos
+- Autenticação via **JWT** com dois tipos de token distintos (`access` e `refresh`) identificados por campo `type` no payload
+- Access tokens com TTL curto (padrão 1h), refresh tokens com TTL longo (padrão 24h), ambos configuráveis via variáveis de ambiente
+- **Refresh token rotation** — a cada renovação o token anterior é invalidado e um novo hash é salvo no banco
+- Rotas protegidas rejeitam requisições sem token válido com HTTP 401
+- Refresh tokens são rejeitados em rotas protegidas — somente access tokens são aceitos pelo `AuthGuard`
+- Controle de acesso por roles (`user`, `admin`) via `RolesGuard` com role embutida no payload JWT
+- Headers de segurança HTTP configurados via **Helmet** (CSP, HSTS, X-Frame-Options, etc.)
+- Rate limiting em três janelas (10 req/s, 50 req/10s, 200 req/min) com limites mais restritivos nos endpoints de autenticação (5 req/min)
 - Usuários só podem editar ou excluir seus próprios recursos, exceto administradores
 - Exclusões de usuários comuns são soft delete; o registro é mantido com `deleted_at` preenchido e omitido das listagens
 - Apenas administradores podem executar hard delete, removendo o registro permanentemente do banco
@@ -94,7 +101,11 @@ API REST para uma rede social simples com suporte a postagens, comentários e si
 - **Linguagem:** TypeScript
 - **ORM:** TypeORM
 - **Banco de dados:** PostgreSQL
-- **Autenticação:** JWT
+- **Autenticação:** JWT (access + refresh token rotation)
+- **Hash:** Argon2
+- **Logs:** pino / nestjs-pino
+- **Rate limiting:** @nestjs/throttler
+- **Segurança HTTP:** Helmet
 
 ---
 
@@ -149,10 +160,14 @@ DB_NAME=social_api
 
 # JWT
 JWT_SECRET=your_secret_key
-JWT_EXPIRES_IN=1d
+JWT_TOKEN_AUDIENCE=http://localhost:3000
+JWT_TOKEN_ISSUER=http://localhost:3000
+JWT_TTL=3600
+JWT_REFRESH_TTL=86400
 
 # Aplicação
-APP_PORT=3000
+PORT=3000
+NODE_ENV=development
 ```
 
 ### Executando
@@ -198,9 +213,10 @@ src/
 ## Endpoints principais
 
 ### Auth
-| Método | Rota | Descrição |
-|---|---|---|
-| POST | `/auth/login` | Autenticar usuário |
+| Método | Rota | Descrição | Acesso |
+|---|---|---|---|
+| POST | `/auth/login` | Autenticar usuário | Público |
+| POST | `/auth/refresh` | Renovar access token via refresh token | Público |
 
 ### Usuários
 | Método | Rota | Descrição | Acesso |
