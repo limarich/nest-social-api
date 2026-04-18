@@ -36,4 +36,19 @@ describe('AuthService', () => {
     const user = await service.login({ email: EMAIL_ADDRESS, password: 'password' });
     expect(user.access_token).toBeDefined();
   })
+
+  it('should return a refresh token', async () => {
+    const user = await service.login({ email: EMAIL_ADDRESS, password: 'password' });
+    expect(user.refresh_token).toBeDefined();
+  })
+
+  it('should refresh a token', async () => {
+    const user = await service.login({ email: EMAIL_ADDRESS, password: 'password' });
+    const refreshedToken = await service.refreshToken({ refresh_token: user.refresh_token });
+    expect(refreshedToken).toBeDefined();
+  })
+
+  it('should not refresh a token', async () => {
+    await expect(service.refreshToken({ refresh_token: 'invalid-token' })).rejects.toThrow(BadRequestException);
+  })
 });

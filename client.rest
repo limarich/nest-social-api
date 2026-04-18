@@ -50,3 +50,12 @@ Content-Type: application/json
     "email": "richard.esclima@gmail.com",
     "password": "password"
 }
+
+### Refresh Token
+# @name refresh_token
+POST {{baseUrl}}/auth/refresh
+Content-Type: application/json
+
+{
+    "refresh_token": "{{user_login.response.body.refresh_token}}"
+}

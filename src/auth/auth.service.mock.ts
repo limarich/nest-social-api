@@ -4,6 +4,11 @@ import { UserServiceMock } from 'src/user/user.service.mock';
 import { UserLoginDto } from './dto/user_login.dto';
 import * as argon from "argon2";
 import { LoginResponseDto } from './dto/login.reponse.dto';
+import { RefreshTokenDto } from './dto/refresh_token.dto';
+import { RefreshTokenResponseDto } from './dto/refresh_token.reponse.dto';
+
+const VALID_TOKEN = "refresh_token";
+
 
 @Injectable()
 export class AuthServiceMock extends UserServiceMock implements IAuthService {
@@ -21,6 +26,13 @@ export class AuthServiceMock extends UserServiceMock implements IAuthService {
         }
 
         const { password, ...userResponseDto } = user;
-        return { user: userResponseDto, access_token: "token" };
+        return { user: userResponseDto, access_token: "token", refresh_token: VALID_TOKEN };
+    }
+
+    async refreshToken(dto: RefreshTokenDto): Promise<RefreshTokenResponseDto> {
+        if (dto.refresh_token !== VALID_TOKEN) {
+            throw new BadRequestException(`Invalid refresh token`);
+        }
+        return { access_token: "token", refresh_token: VALID_TOKEN };
     }
 }
