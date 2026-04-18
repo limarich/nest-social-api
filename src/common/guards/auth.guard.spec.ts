@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY, REQUEST_TOKEN_PAYLOAD_KEY } from '../contants';
 import jwtConfig from '../config/jwt.config';
-import { AuthGuard } from './authGuard';
+import { AuthGuard } from './auth.guard';
 
 const mockJwtConfig = {
     secret: 'test-secret',

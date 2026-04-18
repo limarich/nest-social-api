@@ -1,11 +1,12 @@
 import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { User, UserRole } from './entity/user.entity';
+import { User } from './entity/user.entity';
 import { UserCreateDto } from './dto/user.create.dto';
 import { UserUpdateDto } from './dto/user.update.dto';
 import { IUserService } from './interface/user.service.interface';
 import * as argon from "argon2";
 import { Pagination } from 'src/common/interfaces/paginations.interface';
 import { UserResponseDto } from './dto/user.response.dto';
+import { UserRole } from 'src/common/roles.enum';
 
 export const EMAIL_ADDRESS = "test@gmail.com";
 

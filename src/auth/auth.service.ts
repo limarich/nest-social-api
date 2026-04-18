@@ -40,8 +40,8 @@ export class AuthService implements IAuthService {
         }
 
         const [access_token, refresh_token] = await Promise.all([
-            this.signToken(user.id, user.email, TokenType.ACCESS),
-            this.signToken(user.id, user.email, TokenType.REFRESH),
+            this.signToken(user.id, user.email, TokenType.ACCESS, user.role),
+            this.signToken(user.id, user.email, TokenType.REFRESH, user.role),
         ]);
         const { hashed_password, hashed_refresh_token: _oldToken, ...userResponse } = user;
 
@@ -80,8 +80,8 @@ export class AuthService implements IAuthService {
         }
 
         const [access_token, refresh_token] = await Promise.all([
-            this.signToken(user.id, user.email, TokenType.ACCESS),
-            this.signToken(user.id, user.email, TokenType.REFRESH),
+            this.signToken(user.id, user.email, TokenType.ACCESS, user.role),
+            this.signToken(user.id, user.email, TokenType.REFRESH, user.role),
         ]);
 
         const hashed_refresh_token = await this.hashService.hash(refresh_token);
@@ -92,11 +92,12 @@ export class AuthService implements IAuthService {
 
 
 
-    private async signToken(sub: string, email: string, type: TokenType) {
+    private async signToken(sub: string, email: string, type: TokenType, role: string) {
         return await this.jwtService.signAsync({
             sub,
             email,
-            type
+            type,
+            role
         }, {
             expiresIn: type === TokenType.ACCESS ? this.jwtConfiguration.ttl : this.jwtConfiguration.refresh_ttl,
             audience: this.jwtConfiguration.audience,

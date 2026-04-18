@@ -4,6 +4,8 @@ import { UserUpdateDto } from './dto/user.update.dto';
 import { UserService } from './user.service';
 import { Pagination } from 'src/common/interfaces/paginations.interface';
 import { TokenPayload } from 'src/common/decorators/token_payload.decorator';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { UserRole } from 'src/common/roles.enum';
 
 @Controller('user')
 export class UserController {
@@ -30,6 +32,7 @@ export class UserController {
     }
 
     @Delete(':id')
+    @Roles(UserRole.ADMIN)
     remove(@Param('id') id: string, @TokenPayload('sub') userId: string) {
         return this.userService.remove(id, userId);
     }

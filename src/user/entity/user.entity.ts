@@ -1,10 +1,6 @@
 import { PrimaryGeneratedColumn, Unique, Column, Entity, CreateDateColumn, UpdateDateColumn } from "typeorm";
 import { Exclude } from "class-transformer";
-
-export enum UserRole {
-    ADMIN = "admin",
-    USER = "user"
-}
+import { UserRole } from "src/common/roles.enum";
 
 @Entity()
 @Unique(['email'])

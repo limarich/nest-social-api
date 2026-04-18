@@ -11,7 +11,8 @@ import { LoggerModule } from 'nestjs-pino';
 import { EnvSchema } from 'src/common/schemas/type-orm.schema';
 import { HashModule } from 'src/common/utils/hash/hash.module';
 import databaseConfig from 'src/common/config/database.config';
-import { AuthGuard } from 'src/common/guards/authGuard';
+import { AuthGuard } from 'src/common/guards/auth.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
 
 @Module({
   imports: [
@@ -62,6 +63,10 @@ import { AuthGuard } from 'src/common/guards/authGuard';
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    }
   ],
 })
 export class AppModule { }

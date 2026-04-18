@@ -5,7 +5,7 @@
 
 ### List Users
 GET {{baseUrl}}/user?page=1&limit=10
-Authorization: Bearer {{refreshed_token}}
+Authorization: Bearer {{token}}
 
 ### Find User
 
