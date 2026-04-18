@@ -13,6 +13,7 @@ import { HashModule } from 'src/common/utils/hash/hash.module';
 import databaseConfig from 'src/common/config/database.config';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -38,7 +39,24 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
     }),
     HashModule,
     UserModule,
-    AuthModule
+    AuthModule,
+    ThrottlerModule.forRoot([
+      {
+        name: 'short',
+        ttl: 1000,
+        limit: 10,
+      },
+      {
+        name: 'medium',
+        ttl: 10000,
+        limit: 50,
+      },
+      {
+        name: 'long',
+        ttl: 60000,
+        limit: 200,
+      }
+    ])
   ],
   controllers: [AppController],
   providers: [
@@ -66,7 +84,11 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
-    }
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule { }

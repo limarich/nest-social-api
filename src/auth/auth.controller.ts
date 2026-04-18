@@ -3,7 +3,9 @@ import { AuthService } from './auth.service';
 import { UserLoginDto } from './dto/user_login.dto';
 import { Public } from 'src/common/decorators/public.decorator';
 import { RefreshTokenDto } from './dto/refresh_token.dto';
+import { Throttle } from '@nestjs/throttler';
 
+@Throttle({ short: { ttl: 60000, limit: 5 }, medium: { ttl: 60000, limit: 5 }, long: { ttl: 60000, limit: 10 } })
 @Controller('auth')
 export class AuthController {
     constructor(private readonly authService: AuthService) { }
