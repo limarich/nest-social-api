@@ -19,8 +19,8 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "name": "John",
-    "email": "richard1.teste@gmail.com",
+    "name": "John 2",
+    "email": "richard2.teste@gmail.com",
     "password": "password"
 } 
 
@@ -48,7 +48,7 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-    "email": "richard1.teste@gmail.com",
+    "email": "richard2.teste@gmail.com",
     "password": "password"
 }
 
@@ -60,3 +60,38 @@ Content-Type: application/json
 {
     "refresh_token": "{{user_login.response.body.refresh_token}}"
 }
+
+### Create a Post
+
+POST {{baseUrl}}/post
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "title": "Post 2",
+    "content": "Content 2"
+}
+
+### Update a Post
+PUT {{baseUrl}}/post
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "id": "687f7388-1063-4543-bdbf-9cd26b33eb2c",
+    "title": "Post 2",
+    "content": "Content 1"
+}
+
+### List Posts 
+GET {{baseUrl}}/post?page=1&limit=2
+Authorization: Bearer {{token}}
+
+### Find Post
+GET {{baseUrl}}/post/687f7388-1063-4543-bdbf-9cd26b33eb2c
+Authorization: Bearer {{token}}
+
+### Delete Post
+DELETE {{baseUrl}}/post/687f7388-1063-4543-bdbf-9cd26b33eb2c
+Authorization: Bearer {{token}}
+

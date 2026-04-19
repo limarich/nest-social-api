@@ -2,7 +2,7 @@ import { ExecutionContext } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Reflector } from '@nestjs/core';
 import { RolesGuard } from './roles.guard';
-import { UserRole } from '../roles.enum';
+import { UserRole } from '../enum/roles.enum';
 import { ROLES_KEY } from '../contants';
 import { TokenPayloadDto } from '../dto/token_payload.dto';
 

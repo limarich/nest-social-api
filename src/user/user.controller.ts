@@ -5,7 +5,8 @@ import { UserService } from './user.service';
 import { Pagination } from 'src/common/interfaces/paginations.interface';
 import { TokenPayload } from 'src/common/decorators/token_payload.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { UserRole } from 'src/common/roles.enum';
+import { UserRole } from 'src/common/enum/roles.enum';
+import { Public } from 'src/common/decorators/public.decorator';
 
 @Controller('user')
 export class UserController {
@@ -22,6 +23,7 @@ export class UserController {
     }
 
     @Post()
+    @Public()
     create(@Body() userDto: UserCreateDto) {
         return this.userService.create(userDto);
     }

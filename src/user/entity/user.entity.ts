@@ -1,6 +1,8 @@
-import { PrimaryGeneratedColumn, Unique, Column, Entity, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import { PrimaryGeneratedColumn, Unique, Column, Entity, CreateDateColumn, UpdateDateColumn, OneToMany } from "typeorm";
 import { Exclude } from "class-transformer";
-import { UserRole } from "src/common/roles.enum";
+import { UserRole } from "src/common/enum/roles.enum";
+import { Post } from "src/post/entity/post.entity";
+import { PostReaction } from "src/post/entity/post-reaction.entity";
 
 @Entity()
 @Unique(['email'])
@@ -34,4 +36,10 @@ export class User {
     @Column({ name: 'hashed_refresh_token', nullable: true })
     @Exclude()
     readonly hashedRefreshToken?: string;
+
+    @OneToMany(() => Post, (post) => post.author)
+    posts: Post[];
+
+    @OneToMany(() => PostReaction, (postReaction) => postReaction.user)
+    reactions: PostReaction[];
 }

@@ -14,6 +14,7 @@ import databaseConfig from 'src/common/config/database.config';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { PostModule } from 'src/post/post.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
     HashModule,
     UserModule,
     AuthModule,
+    PostModule,
     ThrottlerModule.forRoot([
       {
         name: 'short',

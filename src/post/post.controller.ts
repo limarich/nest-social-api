@@ -1,0 +1,39 @@
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { PostCreateDto } from './dto/post.create.dto';
+import { PostUpdateDto } from './dto/post.update.dto';
+import { TokenPayload } from 'src/common/decorators/token_payload.decorator';
+import { PostService } from './post.service';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { UserRole } from 'src/common/enum/roles.enum';
+import { Pagination } from 'src/common/interfaces/paginations.interface';
+
+@Controller('post')
+export class PostController {
+    constructor(private readonly postService: PostService) { }
+
+    @Post()
+    create(@Body() dto: PostCreateDto, @TokenPayload('sub') userId: string) {
+        return this.postService.create(dto, userId);
+    }
+
+    @Get()
+    findAll(@Query() pagination: Pagination) {
+        return this.postService.findAll(pagination);
+    }
+
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+        return this.postService.findOne(id);
+    }
+
+    @Put()
+    update(@Body() dto: PostUpdateDto, @TokenPayload('sub') userId: string) {
+        return this.postService.update(dto, userId);
+    }
+
+    @Roles(UserRole.ADMIN)
+    @Delete(':id')
+    remove(@Param('id') id: string, @TokenPayload('sub') userId: string) {
+        return this.postService.remove(id, userId);
+    }
+}

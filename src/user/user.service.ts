@@ -33,15 +33,19 @@ export class UserService implements IUserService {
         return users;
     }
     async findOne(id: string): Promise<UserResponseDto> {
+        const user = await this.findEntity(id);
+        const { hashedPassword, hashedRefreshToken, ...userResponse } = user;
+        return userResponse;
+    }
+
+    async findEntity(id: string): Promise<User> {
         const user = await this.userRepository.findOneBy({ id });
 
         if (!user) {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
 
-        const { hashedPassword, hashedRefreshToken, ...userResponse } = user;
-
-        return userResponse;
+        return user;
     }
     async create(dto: UserCreateDto): Promise<UserResponseDto> {
         try {

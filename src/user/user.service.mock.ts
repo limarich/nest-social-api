@@ -6,7 +6,7 @@ import { IUserService } from './interface/user.service.interface';
 import * as argon from "argon2";
 import { Pagination } from 'src/common/interfaces/paginations.interface';
 import { UserResponseDto } from './dto/user.response.dto';
-import { UserRole } from 'src/common/roles.enum';
+import { UserRole } from 'src/common/enum/roles.enum';
 
 export const EMAIL_ADDRESS = "test@gmail.com";
 
@@ -24,7 +24,9 @@ export class UserServiceMock implements IUserService {
             createdAt: new Date(),
             updatedAt: new Date(),
             role: UserRole.USER,
-            hashedRefreshToken: ""
+            hashedRefreshToken: "",
+            posts: [],
+            reactions: []
         },
             {
                 email: "email2@gmail.com",
@@ -34,7 +36,9 @@ export class UserServiceMock implements IUserService {
                 createdAt: new Date(),
                 updatedAt: new Date(),
                 role: UserRole.USER,
-                hashedRefreshToken: ""
+                hashedRefreshToken: "",
+                posts: [],
+                reactions: []
             })
 
     }
@@ -82,7 +86,9 @@ export class UserServiceMock implements IUserService {
             createdAt: new Date(),
             updatedAt: new Date(),
             role: UserRole.USER,
-            hashedPassword: ''
+            hashedPassword: '',
+            posts: [],
+            reactions: []
         }
         this.users.push(newUser);
         const { hashedPassword, hashedRefreshToken, ...userResponse } = newUser;
