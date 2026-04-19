@@ -29,6 +29,8 @@ describe('PostController', () => {
             findOne: jest.fn(),
             update: jest.fn(),
             remove: jest.fn(),
+            findUserPosts: jest.fn(),
+            findCurrentUserPosts: jest.fn(),
           },
         },
       ],
@@ -59,7 +61,7 @@ describe('PostController', () => {
     it('should return an array of posts', async () => {
       postService.findAll.mockResolvedValue([mockPost]);
 
-      const result = await controller.findAll();
+      const result = await controller.findAll({});
 
       expect(postService.findAll).toHaveBeenCalled();
       expect(result).toEqual([mockPost]);
@@ -99,5 +101,34 @@ describe('PostController', () => {
 
       expect(postService.remove).toHaveBeenCalledWith('post-uuid', 'user-uuid');
     });
+  });
+
+  describe('user posts', () => {
+    it('should call PostService.findUserPosts with id and userId', async () => {
+      postService.findUserPosts.mockResolvedValue([mockPost]);
+
+      const result = await controller.findUserPosts('user-uuid', {});
+
+      expect(postService.findUserPosts).toHaveBeenCalledWith('user-uuid');
+      expect(result).toEqual([mockPost]);
+    })
+
+    it('should return an empty array if user has no posts', async () => {
+      postService.findUserPosts.mockResolvedValue([]);
+
+      const result = await controller.findUserPosts('user-uuid', {});
+
+      expect(postService.findUserPosts).toHaveBeenCalledWith('user-uuid');
+      expect(result).toEqual([]);
+    })
+
+    it('should return posts of logged in user', async () => {
+      postService.findCurrentUserPosts.mockResolvedValue([mockPost]);
+
+      const result = await controller.findCurrentUserPosts('user-uuid', {});
+
+      expect(postService.findCurrentUserPosts).toHaveBeenCalledWith('user-uuid');
+      expect(result).toEqual([mockPost]);
+    })
   });
 });

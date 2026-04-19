@@ -10,4 +10,6 @@ export abstract class IPostService {
     abstract findOne(id: string): Promise<PostResponseDto>;
     abstract update(post: PostUpdateDto, userId: string): Promise<PostResponseDto>;
     abstract remove(id: string, userId: string): Promise<void>;
+    abstract findUserPosts(userId: string): Promise<PostResponseDto[]>;
+    abstract findCurrentUserPosts(userId: string): Promise<PostResponseDto[]>;
 }

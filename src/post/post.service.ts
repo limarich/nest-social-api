@@ -123,4 +123,43 @@ export class PostService implements IPostService {
         await this.postRepository.remove(post);
     }
 
+    async findUserPosts(userId: string, pagination: Pagination = {}): Promise<PostResponseDto[]> {
+        const { page = 1, limit = 10 } = pagination;
+        const userPosts = await this.postRepository.find({
+            where: { authorId: userId },
+            relations: ['author', 'reactions'],
+            skip: (page - 1) * limit,
+            take: limit,
+        });
+
+        return userPosts.map(post => ({
+            id: post.id,
+            title: post.title,
+            content: post.content,
+            created_at: post.createdAt,
+            updated_at: post.updatedAt,
+            author: post.author.name,
+            reactions: post.reactions.map(reaction => reaction.type)
+        }));
+    }
+
+    async findCurrentUserPosts(userId: string, pagination: Pagination = {}): Promise<PostResponseDto[]> {
+        const { page = 1, limit = 10 } = pagination;
+        const userPosts = await this.postRepository.find({
+            where: { authorId: userId },
+            relations: ['author', 'reactions'],
+            skip: (page - 1) * limit,
+            take: limit,
+        });
+
+        return userPosts.map(post => ({
+            id: post.id,
+            title: post.title,
+            content: post.content,
+            created_at: post.createdAt,
+            updated_at: post.updatedAt,
+            author: post.author.name,
+            reactions: post.reactions.map(reaction => reaction.type)
+        }));
+    }
 }

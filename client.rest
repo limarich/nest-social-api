@@ -48,7 +48,7 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-    "email": "richard2.teste@gmail.com",
+    "email": "richard1.teste@gmail.com",
     "password": "password"
 }
 
@@ -95,3 +95,10 @@ Authorization: Bearer {{token}}
 DELETE {{baseUrl}}/post/687f7388-1063-4543-bdbf-9cd26b33eb2c
 Authorization: Bearer {{token}}
 
+### Find User Posts
+GET {{baseUrl}}/post/user/{{userId}}?page=1&limit=1
+Authorization: Bearer {{token}}
+
+### Find Current User Posts
+GET {{baseUrl}}/post/my-posts?page=1&limit=2
+Authorization: Bearer {{token}}

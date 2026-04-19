@@ -91,4 +91,14 @@ describe('PostService', () => {
   it('should throw NotFoundException when removing nonexistent post', async () => {
     await expect(postService.remove('nonexistent', 'abc-123')).rejects.toThrow(NotFoundException);
   });
+
+  it('should find user posts', async () => {
+    const userPosts = await postService.findUserPosts('abc-123');
+    expect(userPosts).toHaveLength(1);
+  })
+
+  it('should find current user posts', async () => {
+    const userPosts = await postService.findCurrentUserPosts('abc-123');
+    expect(userPosts).toHaveLength(1);
+  })
 });

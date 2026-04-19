@@ -143,4 +143,36 @@ export class PostServiceMock implements IPostService {
 
         this.posts.splice(postIndex, 1);
     }
+
+    async findUserPosts(userId: string, pagination: Pagination = {}): Promise<PostResponseDto[]> {
+        const { page = 1, limit = 10 } = pagination;
+        const userPosts = this.posts.filter(posts => posts.authorId === userId)
+            .slice((page - 1) * limit, page * limit);
+
+        return userPosts.map(post => ({
+            id: post.id,
+            title: post.title,
+            content: post.content,
+            created_at: post.createdAt,
+            updated_at: post.updatedAt,
+            author: post.author.name,
+            reactions: post.reactions.map(reaction => reaction.type)
+        }));
+    }
+
+    async findCurrentUserPosts(userId: string, pagination: Pagination = {}): Promise<PostResponseDto[]> {
+        const { page = 1, limit = 10 } = pagination;
+        const userPosts = this.posts.filter(posts => posts.authorId === userId)
+            .slice((page - 1) * limit, page * limit);
+
+        return userPosts.map(post => ({
+            id: post.id,
+            title: post.title,
+            content: post.content,
+            created_at: post.createdAt,
+            updated_at: post.updatedAt,
+            author: post.author.name,
+            reactions: post.reactions.map(reaction => reaction.type)
+        }));
+    }
 }

@@ -21,6 +21,16 @@ export class PostController {
         return this.postService.findAll(pagination);
     }
 
+    @Get('my-posts')
+    findCurrentUserPosts(@TokenPayload('sub') userId: string, @Query() pagination: Pagination) {
+        return this.postService.findCurrentUserPosts(userId, pagination);
+    }
+
+    @Get('user/:userId')
+    findUserPosts(@Param('userId') userId: string, @Query() pagination: Pagination) {
+        return this.postService.findUserPosts(userId, pagination);
+    }
+
     @Get(':id')
     findOne(@Param('id') id: string) {
         return this.postService.findOne(id);
@@ -36,4 +46,5 @@ export class PostController {
     remove(@Param('id') id: string, @TokenPayload('sub') userId: string) {
         return this.postService.remove(id, userId);
     }
+
 }
