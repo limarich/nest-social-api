@@ -3,6 +3,8 @@
 @refreshed_token = {{refresh_token.response.body.access_token}}
 @userId = {{user_login.response.body.user.id}}
 
+@postId = {{list_posts.response.body.$[0].id}}
+
 ### List Users
 GET {{baseUrl}}/user?page=1&limit=10
 Authorization: Bearer {{token}}
@@ -84,6 +86,8 @@ Authorization: Bearer {{token}}
 }
 
 ### List Posts 
+# @name list_posts
+
 GET {{baseUrl}}/post?page=1&limit=2
 Authorization: Bearer {{token}}
 
@@ -102,3 +106,12 @@ Authorization: Bearer {{token}}
 ### Find Current User Posts
 GET {{baseUrl}}/post/my-posts?page=1&limit=2
 Authorization: Bearer {{token}}
+
+### React To Post
+POST {{baseUrl}}/post/react/{{postId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "type": "unlike"
+}

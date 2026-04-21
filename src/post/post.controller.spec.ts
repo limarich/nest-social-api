@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PostController } from './post.controller';
 import { PostService } from './post.service';
 import { PostResponseDto } from './dto/post.response.dto';
+import { PostReactionService } from './post-reaction.service';
+import { ReactionType } from './entity/post-reaction.entity';
 
 const mockPost: PostResponseDto = {
   id: 'post-uuid',
@@ -16,6 +18,7 @@ const mockPost: PostResponseDto = {
 describe('PostController', () => {
   let controller: PostController;
   let postService: jest.Mocked<PostService>;
+  let postReactionService: jest.Mocked<PostReactionService>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -33,11 +36,19 @@ describe('PostController', () => {
             findCurrentUserPosts: jest.fn(),
           },
         },
+        {
+          provide: PostReactionService,
+          useValue: {
+            react: jest.fn(),
+            unreact: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
     controller = module.get<PostController>(PostController);
     postService = module.get(PostService);
+    postReactionService = module.get(PostReactionService);
   });
 
   it('should be defined', () => {
@@ -63,7 +74,7 @@ describe('PostController', () => {
 
       const result = await controller.findAll({});
 
-      expect(postService.findAll).toHaveBeenCalled();
+      expect(postService.findAll).toHaveBeenCalledWith({});
       expect(result).toEqual([mockPost]);
     });
   });
@@ -104,31 +115,41 @@ describe('PostController', () => {
   });
 
   describe('user posts', () => {
-    it('should call PostService.findUserPosts with id and userId', async () => {
+    it('should call PostService.findUserPosts with userId and pagination', async () => {
       postService.findUserPosts.mockResolvedValue([mockPost]);
 
       const result = await controller.findUserPosts('user-uuid', {});
 
-      expect(postService.findUserPosts).toHaveBeenCalledWith('user-uuid');
+      expect(postService.findUserPosts).toHaveBeenCalledWith('user-uuid', {});
       expect(result).toEqual([mockPost]);
-    })
+    });
 
     it('should return an empty array if user has no posts', async () => {
       postService.findUserPosts.mockResolvedValue([]);
 
       const result = await controller.findUserPosts('user-uuid', {});
 
-      expect(postService.findUserPosts).toHaveBeenCalledWith('user-uuid');
+      expect(postService.findUserPosts).toHaveBeenCalledWith('user-uuid', {});
       expect(result).toEqual([]);
-    })
+    });
 
     it('should return posts of logged in user', async () => {
       postService.findCurrentUserPosts.mockResolvedValue([mockPost]);
 
       const result = await controller.findCurrentUserPosts('user-uuid', {});
 
-      expect(postService.findCurrentUserPosts).toHaveBeenCalledWith('user-uuid');
+      expect(postService.findCurrentUserPosts).toHaveBeenCalledWith('user-uuid', {});
       expect(result).toEqual([mockPost]);
-    })
+    });
+  });
+
+  describe('react', () => {
+    it('should call PostReactionService.react with postId, userId and type', async () => {
+      postReactionService.react.mockResolvedValue(undefined);
+
+      await controller.react('post-uuid', 'user-uuid', { type: ReactionType.LIKE });
+
+      expect(postReactionService.react).toHaveBeenCalledWith('post-uuid', 'user-uuid', ReactionType.LIKE);
+    });
   });
 });
