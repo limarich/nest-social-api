@@ -70,8 +70,8 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "title": "Post 2",
-    "content": "Content 2"
+    "title": "Post 4",
+    "content": "Content 4"
 }
 
 ### Update a Post
@@ -88,11 +88,11 @@ Authorization: Bearer {{token}}
 ### List Posts 
 # @name list_posts
 
-GET {{baseUrl}}/post?page=1&limit=2
+GET {{baseUrl}}/post?page=1&limit=3
 Authorization: Bearer {{token}}
 
 ### Find Post
-GET {{baseUrl}}/post/687f7388-1063-4543-bdbf-9cd26b33eb2c
+GET {{baseUrl}}/post/9055815a-9a2c-40e0-bca4-3a66dd363125
 Authorization: Bearer {{token}}
 
 ### Delete Post
@@ -108,10 +108,10 @@ GET {{baseUrl}}/post/my-posts?page=1&limit=2
 Authorization: Bearer {{token}}
 
 ### React To Post
-POST {{baseUrl}}/post/react/{{postId}}
+POST {{baseUrl}}/post/react/9055815a-9a2c-40e0-bca4-3a66dd363125
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "type": "unlike"
+    "type": "like"
 }

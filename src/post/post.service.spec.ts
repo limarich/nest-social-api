@@ -63,11 +63,11 @@ describe('PostService', () => {
   });
 
   it('should update a post', async () => {
-    const post = await postService.update({
+    const post = await postService.update('abc-123', {
       id: 'abc-123',
       title: 'Updated Title',
       content: 'Updated Content',
-    }, 'abc-123');
+    });
 
     expect(post.title).toBe('Updated Title');
     expect(post.content).toBe('Updated Content');
@@ -75,7 +75,7 @@ describe('PostService', () => {
 
   it('should throw UnauthorizedException when updating another user post', async () => {
     await expect(
-      postService.update({ id: 'abc-123', title: 'X', content: 'Y' }, 'other-user'),
+      postService.update('other-user', { id: 'abc-123', title: 'X', content: 'Y' }),
     ).rejects.toThrow(UnauthorizedException);
   });
 

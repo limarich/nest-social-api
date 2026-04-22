@@ -43,7 +43,7 @@ export class PostController {
 
     @Put()
     update(@Body() dto: PostUpdateDto, @TokenPayload('sub') userId: string) {
-        return this.postService.update(dto, userId);
+        return this.postService.update(userId, dto);
     }
 
     @Roles(UserRole.ADMIN)

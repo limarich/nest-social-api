@@ -10,7 +10,9 @@ const mockPost: PostResponseDto = {
   title: 'Test Post',
   content: 'Test Content',
   author: 'John Doe',
-  reactions: [],
+  user_reaction: null,
+  likes: 0,
+  unlikes: 0,
   created_at: new Date('2024-01-01'),
   updated_at: new Date('2024-01-01'),
 };
@@ -40,7 +42,6 @@ describe('PostController', () => {
           provide: PostReactionService,
           useValue: {
             react: jest.fn(),
-            unreact: jest.fn(),
           },
         },
       ],
@@ -99,7 +100,7 @@ describe('PostController', () => {
 
       const result = await controller.update(dto, userId);
 
-      expect(postService.update).toHaveBeenCalledWith(dto, userId);
+      expect(postService.update).toHaveBeenCalledWith(userId, dto);
       expect(result).toEqual(updatedPost);
     });
   });

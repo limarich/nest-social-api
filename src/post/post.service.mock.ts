@@ -29,7 +29,9 @@ export class PostServiceMock implements IPostService {
             createdAt: new Date(),
             reactions: [],
             title: "Test Post",
-            updatedAt: new Date()
+            updatedAt: new Date(),
+            likes: 0,
+            unlikes: 0,
         }
 
         this.posts.push(newPost);
@@ -50,7 +52,9 @@ export class PostServiceMock implements IPostService {
             createdAt: new Date(),
             reactions: [],
             title: post.title,
-            updatedAt: new Date()
+            updatedAt: new Date(),
+            likes: 0,
+            unlikes: 0,
         }
 
         this.posts.push(newPost);
@@ -62,7 +66,9 @@ export class PostServiceMock implements IPostService {
             created_at: newPost.createdAt,
             updated_at: newPost.updatedAt,
             author: newPost.author.name,
-            reactions: newPost.reactions.map(reaction => reaction.type)
+            user_reaction: null,
+            likes: 0,
+            unlikes: 0,
         };
     }
 
@@ -77,7 +83,9 @@ export class PostServiceMock implements IPostService {
             created_at: post.createdAt,
             updated_at: post.updatedAt,
             author: post.author.name,
-            reactions: post.reactions.map(reaction => reaction.type)
+            user_reaction: null,
+            likes: 0,
+            unlikes: 0,
         }));
     }
 
@@ -97,11 +105,13 @@ export class PostServiceMock implements IPostService {
             created_at: post.createdAt,
             updated_at: post.updatedAt,
             author: post.author.name,
-            reactions: post.reactions.map(reaction => reaction.type)
+            user_reaction: null,
+            likes: 0,
+            unlikes: 0,
         };
     }
 
-    async update(post: PostUpdateDto, userId: string): Promise<PostResponseDto> {
+    async update(userId: string, post: PostUpdateDto): Promise<PostResponseDto> {
         const postIndex = this.posts.findIndex(p => p.id === post.id);
 
         if (postIndex === -1) {
@@ -126,7 +136,9 @@ export class PostServiceMock implements IPostService {
             created_at: updatedPost.createdAt,
             updated_at: updatedPost.updatedAt,
             author: updatedPost.author.name,
-            reactions: updatedPost.reactions.map(reaction => reaction.type)
+            user_reaction: null,
+            likes: 0,
+            unlikes: 0,
         };
     }
 
@@ -156,7 +168,9 @@ export class PostServiceMock implements IPostService {
             created_at: post.createdAt,
             updated_at: post.updatedAt,
             author: post.author.name,
-            reactions: post.reactions.map(reaction => reaction.type)
+            user_reaction: null,
+            likes: 0,
+            unlikes: 0,
         }));
     }
 
@@ -172,7 +186,9 @@ export class PostServiceMock implements IPostService {
             created_at: post.createdAt,
             updated_at: post.updatedAt,
             author: post.author.name,
-            reactions: post.reactions.map(reaction => reaction.type)
+            user_reaction: null,
+            likes: 0,
+            unlikes: 0,
         }));
     }
 }

@@ -28,4 +28,14 @@ export class Post {
 
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @Column({
+        default: 0
+    })
+    likes: number;
+
+    @Column({
+        default: 0
+    })
+    unlikes: number;
 }

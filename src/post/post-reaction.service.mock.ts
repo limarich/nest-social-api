@@ -16,8 +16,8 @@ export class PostReactionServiceMock implements IPostReactionService {
             userId: 'user-123',
             type: ReactionType.LIKE,
             createdAt: new Date(),
-            post: new Post,
-            user: new User
+            post: new Post(),
+            user: new User()
         }]
     }
 
@@ -31,24 +31,20 @@ export class PostReactionServiceMock implements IPostReactionService {
                 userId,
                 type,
                 createdAt: new Date(),
-                post: new Post,
-                user: new User
+                post: new Post(),
+                user: new User()
             });
             return;
         }
 
         if (reaction.type === type) {
-            await this.unreact(postId, userId);
+            this.postReactions = this.postReactions.filter(r => r.userId !== userId || r.postId !== postId);
             return;
         }
 
         this.postReactions = this.postReactions.map(r =>
             r.userId === userId && r.postId === postId ? { ...r, type } : r
         );
-    }
-
-    async unreact(postId: string, userId: string): Promise<void> {
-        this.postReactions = this.postReactions.filter(r => r.userId !== userId || r.postId !== postId);
     }
 
     findReaction(postId: string, userId: string): PostReaction | undefined {

@@ -38,20 +38,10 @@ describe('PostReactionService', () => {
     expect(reaction!.type).toBe(ReactionType.UNLIKE);
   });
 
-  it('should remove reaction when unreact is called', async () => {
-    await reactionService.unreact('post-123', 'user-123');
-    const reaction = reactionService.findReaction('post-123', 'user-123');
-    expect(reaction).toBeUndefined();
-  });
-
-  it('should not affect other reactions when unreacting', async () => {
+  it('should not affect other reactions when toggling', async () => {
     await reactionService.react('post-456', 'user-456', ReactionType.LIKE);
-    await reactionService.unreact('post-123', 'user-123');
+    await reactionService.react('post-123', 'user-123', ReactionType.LIKE); // remove existing
     const other = reactionService.findReaction('post-456', 'user-456');
     expect(other).toBeDefined();
-  });
-
-  it('should do nothing when unreacting a nonexistent reaction', async () => {
-    await expect(reactionService.unreact('nonexistent', 'user-123')).resolves.not.toThrow();
   });
 });

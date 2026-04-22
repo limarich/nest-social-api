@@ -33,7 +33,9 @@ export class PostService implements IPostService {
             created_at: post.createdAt,
             updated_at: post.updatedAt,
             author: post.author.name,
-            reactions: []
+            user_reaction: null,
+            likes: 0,
+            unlikes: 0,
         };
     }
     async findAll(pagination: Pagination = {}): Promise<PostResponseDto[]> {
@@ -44,6 +46,7 @@ export class PostService implements IPostService {
             take: limit,
             relations: ['author', 'reactions'],
         })
+
         const postsResponse = posts.map(post => ({
             id: post.id,
             title: post.title,
@@ -51,7 +54,9 @@ export class PostService implements IPostService {
             created_at: post.createdAt,
             updated_at: post.updatedAt,
             author: post.author.name,
-            reactions: post.reactions.map(reaction => reaction.type)
+            user_reaction: null,
+            likes: post.likes,
+            unlikes: post.unlikes,
         }))
 
         return postsResponse;
@@ -73,10 +78,12 @@ export class PostService implements IPostService {
             created_at: post.createdAt,
             updated_at: post.updatedAt,
             author: post.author.name,
-            reactions: post.reactions.map(reaction => reaction.type)
+            user_reaction: null,
+            likes: post.likes,
+            unlikes: post.unlikes,
         };
     }
-    async update(dto: PostUpdateDto, userId: string): Promise<PostResponseDto> {
+    async update(userId: string, dto: PostUpdateDto): Promise<PostResponseDto> {
         const post = await this.postRepository.findOne({
             where: { id: dto.id },
             relations: ['author', 'reactions']
@@ -103,7 +110,9 @@ export class PostService implements IPostService {
             created_at: updatedPost.createdAt,
             updated_at: updatedPost.updatedAt,
             author: updatedPost.author.name,
-            reactions: updatedPost.reactions.map(reaction => reaction.type)
+            user_reaction: null,
+            likes: updatedPost.likes,
+            unlikes: updatedPost.unlikes,
         };
     }
     async remove(id: string, userId: string): Promise<void> {
@@ -139,7 +148,9 @@ export class PostService implements IPostService {
             created_at: post.createdAt,
             updated_at: post.updatedAt,
             author: post.author.name,
-            reactions: post.reactions.map(reaction => reaction.type)
+            user_reaction: null,
+            likes: post.likes,
+            unlikes: post.unlikes,
         }));
     }
 
@@ -159,7 +170,9 @@ export class PostService implements IPostService {
             created_at: post.createdAt,
             updated_at: post.updatedAt,
             author: post.author.name,
-            reactions: post.reactions.map(reaction => reaction.type)
+            user_reaction: null,
+            likes: post.likes,
+            unlikes: post.unlikes,
         }));
     }
 }
