@@ -22,8 +22,8 @@ export class PostController {
     }
 
     @Get()
-    findAll(@Query() pagination: Pagination) {
-        return this.postService.findAll(pagination);
+    findAll(@Query() pagination: Pagination, @TokenPayload('sub') userId: string) {
+        return this.postService.findAll(pagination, userId);
     }
 
     @Get('my-posts')

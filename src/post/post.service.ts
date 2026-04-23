@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entity/post.entity';
 import { Repository } from 'typeorm';
 import { UserService } from 'src/user/user.service';
+import { PostReaction } from './entity/post-reaction.entity';
 
 @Injectable()
 export class PostService implements IPostService {
@@ -38,14 +39,21 @@ export class PostService implements IPostService {
             unlikes: 0,
         };
     }
-    async findAll(pagination: Pagination = {}): Promise<PostResponseDto[]> {
+    async findAll(pagination: Pagination = {}, userId: string): Promise<PostResponseDto[]> {
         const { page = 1, limit = 10 } = pagination;
 
-        const posts = await this.postRepository.find({
-            skip: (page - 1) * limit,
-            take: limit,
-            relations: ['author', 'reactions'],
-        })
+        const posts = await this.postRepository.createQueryBuilder('post')
+            .leftJoinAndSelect('post.author', 'author')
+            .leftJoinAndMapOne(
+                'post.userReaction',
+                'post.reactions',
+                'userReaction',
+                'userReaction.userId = :userId',
+                { userId }
+            )
+            .skip((page - 1) * limit)
+            .take(limit)
+            .getMany() as (Post & { userReaction: PostReaction | null })[];
 
         const postsResponse = posts.map(post => ({
             id: post.id,
@@ -54,7 +62,7 @@ export class PostService implements IPostService {
             created_at: post.createdAt,
             updated_at: post.updatedAt,
             author: post.author.name,
-            user_reaction: null,
+            user_reaction: post.userReaction?.type || null,
             likes: post.likes,
             unlikes: post.unlikes,
         }))
