@@ -52,13 +52,13 @@ describe('PostService', () => {
   });
 
   it('should find all posts', async () => {
-    const posts = await postService.findAll({ page: 1, limit: 10 });
+    const posts = await postService.findAll({ page: 1, limit: 10 }, 'abc-123');
     expect(posts).toHaveLength(1);
     expect(posts[0].id).toBe('abc-123');
   });
 
   it('should return empty array for out-of-range page', async () => {
-    const posts = await postService.findAll({ page: 99, limit: 10 });
+    const posts = await postService.findAll({ page: 99, limit: 10 }, 'abc-123');
     expect(posts).toHaveLength(0);
   });
 

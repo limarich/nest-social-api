@@ -72,7 +72,7 @@ export class PostServiceMock implements IPostService {
         };
     }
 
-    async findAll(pagination: Pagination = {}): Promise<PostResponseDto[]> {
+    async findAll(pagination: Pagination = {}, userId: string): Promise<PostResponseDto[]> {
         const { limit = 10, page = 1 } = pagination;
         const posts = this.posts.slice((page - 1) * limit, page * limit);
 

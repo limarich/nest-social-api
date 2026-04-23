@@ -73,9 +73,9 @@ describe('PostController', () => {
     it('should return an array of posts', async () => {
       postService.findAll.mockResolvedValue([mockPost]);
 
-      const result = await controller.findAll({});
+      const result = await controller.findAll({}, "user-uuid");
 
-      expect(postService.findAll).toHaveBeenCalledWith({});
+      expect(postService.findAll).toHaveBeenCalledWith({}, "user-uuid");
       expect(result).toEqual([mockPost]);
     });
   });
