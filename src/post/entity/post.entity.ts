@@ -1,6 +1,7 @@
 import { User } from "src/user/entity/user.entity";
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { PostReaction } from "./post-reaction.entity";
+import { Comment } from "src/comment/entity/comment.entity";
 
 @Entity()
 export class Post {
@@ -22,6 +23,9 @@ export class Post {
 
     @OneToMany(() => PostReaction, (reaction) => reaction.post)
     reactions: PostReaction[];
+
+    @OneToMany(() => Comment, (comment) => comment.post)
+    comments: Comment[];
 
     @CreateDateColumn()
     createdAt: Date;

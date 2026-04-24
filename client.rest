@@ -5,6 +5,10 @@
 
 @postId = {{list_posts.response.body.$[0].id}}
 
+@commentId = {{list_comments.response.body.$[0].id}}
+
+@replyId = {{list_replies.response.body.$[0].id}}
+
 ### List Users
 GET {{baseUrl}}/user?page=1&limit=10
 Authorization: Bearer {{token}}
@@ -114,4 +118,45 @@ Authorization: Bearer {{token}}
 
 {
     "type": "like"
+}
+
+
+### List Comments
+# @name list_comments
+GET {{baseUrl}}/comment/{{postId}}?page=1&limit=10
+Authorization: Bearer {{token}}
+
+### List Replies
+# @name list_replies
+GET {{baseUrl}}/comment/replies/{{commentId}}
+Authorization: Bearer {{token}}
+
+### Create Comment
+POST {{baseUrl}}/comment
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "postId": "{{postId}}",
+    "content": "Comment 1"
+}
+
+### Create Reply
+POST {{baseUrl}}/comment/reply
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "parentId": "{{commentId}}",
+    "content": "Reply 2"
+}
+
+### Update Comment
+PUT {{baseUrl}}/comment
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "commentId": "{{commentId}}",
+    "content": "Reply 2 updated"
 }

@@ -26,7 +26,8 @@ export class UserServiceMock implements IUserService {
             role: UserRole.USER,
             hashedRefreshToken: "",
             posts: [],
-            reactions: []
+            reactions: [],
+            comments: []
         },
             {
                 email: "email2@gmail.com",
@@ -38,7 +39,8 @@ export class UserServiceMock implements IUserService {
                 role: UserRole.USER,
                 hashedRefreshToken: "",
                 posts: [],
-                reactions: []
+                reactions: [],
+                comments: []
             })
 
     }
@@ -88,7 +90,8 @@ export class UserServiceMock implements IUserService {
             role: UserRole.USER,
             hashedPassword: '',
             posts: [],
-            reactions: []
+            reactions: [],
+            comments: []
         }
         this.users.push(newUser);
         const { hashedPassword, hashedRefreshToken, ...userResponse } = newUser;

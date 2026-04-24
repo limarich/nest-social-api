@@ -32,6 +32,7 @@ export class PostServiceMock implements IPostService {
             updatedAt: new Date(),
             likes: 0,
             unlikes: 0,
+            comments: []
         }
 
         this.posts.push(newPost);
@@ -55,6 +56,7 @@ export class PostServiceMock implements IPostService {
             updatedAt: new Date(),
             likes: 0,
             unlikes: 0,
+            comments: []
         }
 
         this.posts.push(newPost);

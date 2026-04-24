@@ -3,6 +3,7 @@ import { Exclude } from "class-transformer";
 import { UserRole } from "src/common/enum/roles.enum";
 import { Post } from "src/post/entity/post.entity";
 import { PostReaction } from "src/post/entity/post-reaction.entity";
+import { Comment } from "src/comment/entity/comment.entity";
 
 @Entity()
 @Unique(['email'])
@@ -42,4 +43,7 @@ export class User {
 
     @OneToMany(() => PostReaction, (postReaction) => postReaction.user)
     reactions: PostReaction[];
+
+    @OneToMany(() => Comment, (comment) => comment.user)
+    comments: Comment[];
 }
