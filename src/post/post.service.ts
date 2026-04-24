@@ -37,6 +37,7 @@ export class PostService implements IPostService {
             user_reaction: null,
             likes: 0,
             unlikes: 0,
+            comment_count: 0,
         };
     }
     async findAll(pagination: Pagination = {}, userId: string): Promise<PostResponseDto[]> {
@@ -65,6 +66,7 @@ export class PostService implements IPostService {
             user_reaction: post.userReaction?.type || null,
             likes: post.likes,
             unlikes: post.unlikes,
+            comment_count: post.commentCount,
         }))
 
         return postsResponse;
@@ -89,6 +91,7 @@ export class PostService implements IPostService {
             user_reaction: null,
             likes: post.likes,
             unlikes: post.unlikes,
+            comment_count: post.commentCount,
         };
     }
     async update(userId: string, dto: PostUpdateDto): Promise<PostResponseDto> {
@@ -121,6 +124,7 @@ export class PostService implements IPostService {
             user_reaction: null,
             likes: updatedPost.likes,
             unlikes: updatedPost.unlikes,
+            comment_count: updatedPost.commentCount,
         };
     }
     async remove(id: string, userId: string): Promise<void> {
@@ -159,6 +163,7 @@ export class PostService implements IPostService {
             user_reaction: null,
             likes: post.likes,
             unlikes: post.unlikes,
+            comment_count: post.commentCount,
         }));
     }
 
@@ -181,6 +186,7 @@ export class PostService implements IPostService {
             user_reaction: null,
             likes: post.likes,
             unlikes: post.unlikes,
+            comment_count: post.commentCount,
         }));
     }
 }

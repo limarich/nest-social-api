@@ -42,4 +42,9 @@ export class Post {
         default: 0
     })
     unlikes: number;
+
+    @Column({
+        default: 0
+    })
+    commentCount: number;
 }

@@ -33,7 +33,7 @@ export class CommentServiceMock implements ICommentService {
                 parentId: null,
                 replies: [],
                 post: new Post(),
-                user: new User(),
+                user: new User()
             }
         ];
     }
@@ -62,10 +62,11 @@ export class CommentServiceMock implements ICommentService {
             parentId: null,
             replies: [],
             post: new Post(),
-            user: new User(),
+            user: new User()
         };
 
         this.comments.push(newComment);
+        this.postService.modifyCommentCount(dto.postId, 1);
         return newComment;
     }
 
@@ -90,10 +91,11 @@ export class CommentServiceMock implements ICommentService {
             parentId: dto.parentId,
             replies: [],
             post: new Post(),
-            user: new User(),
+            user: new User()
         };
 
         this.comments.push(newComment);
+        parentComment.repliesCount += 1;
         return newComment;
     }
 
@@ -130,6 +132,14 @@ export class CommentServiceMock implements ICommentService {
 
         if (comment.userId !== userId) {
             throw new UnauthorizedException("You are not authorized to delete this comment");
+        }
+
+        if (comment.parentId) {
+            const parent = this.comments.find(c => c.id === comment.parentId);
+            if (parent) parent.repliesCount -= 1;
+        } else {
+            this.postService.modifyCommentCount(comment.postId, -1);
+            this.comments = this.comments.filter(c => c.parentId === comment.id ? false : true);
         }
 
         this.comments = this.comments.filter((c) => c.id !== commentId);

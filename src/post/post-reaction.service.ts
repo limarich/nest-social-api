@@ -69,11 +69,8 @@ export class PostReactionService implements IPostReactionService {
         const reaction = this.postReactionRepository.create({ postId, type, userId });
         await this.postReactionRepository.save(reaction);
 
-        // update post count
-        await this.postRepository.update(postId, {
-            likes: type === ReactionType.LIKE ? post.likes + 1 : post.likes,
-            unlikes: type === ReactionType.UNLIKE ? post.unlikes + 1 : post.unlikes,
-        });
+        const field = type === ReactionType.LIKE ? 'likes' : 'unlikes';
+        await this.postRepository.increment({ id: postId }, field, 1);
 
         return;
     }

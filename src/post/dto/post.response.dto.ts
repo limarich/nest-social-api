@@ -10,4 +10,5 @@ export class PostResponseDto {
     readonly user_reaction: ReactionType | null;
     readonly likes: number;
     readonly unlikes: number;
+    readonly comment_count: number;
 }

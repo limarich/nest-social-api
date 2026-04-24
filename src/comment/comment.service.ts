@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ICommentService } from './interface/comment.service.interface';
 import { Comment } from './entity/comment.entity';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from 'src/post/entity/post.entity';
 import { User } from 'src/user/entity/user.entity';
@@ -70,7 +70,7 @@ export class CommentService implements ICommentService {
         const { limit = 10, page = 1 } = pagination;
         const skip = (page - 1) * limit;
         return this.commentRepository.find({
-            where: { postId },
+            where: { postId, parentId: IsNull() },
             relations: ['user'],
             skip,
             take: limit,

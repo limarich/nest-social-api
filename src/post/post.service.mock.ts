@@ -32,7 +32,8 @@ export class PostServiceMock implements IPostService {
             updatedAt: new Date(),
             likes: 0,
             unlikes: 0,
-            comments: []
+            comments: [],
+            commentCount: 0
         }
 
         this.posts.push(newPost);
@@ -56,7 +57,8 @@ export class PostServiceMock implements IPostService {
             updatedAt: new Date(),
             likes: 0,
             unlikes: 0,
-            comments: []
+            comments: [],
+            commentCount: 0
         }
 
         this.posts.push(newPost);
@@ -71,6 +73,7 @@ export class PostServiceMock implements IPostService {
             user_reaction: null,
             likes: 0,
             unlikes: 0,
+            comment_count: 0,
         };
     }
 
@@ -86,8 +89,9 @@ export class PostServiceMock implements IPostService {
             updated_at: post.updatedAt,
             author: post.author.name,
             user_reaction: null,
-            likes: 0,
-            unlikes: 0,
+            likes: post.likes,
+            unlikes: post.unlikes,
+            comment_count: post.commentCount,
         }));
     }
 
@@ -108,8 +112,9 @@ export class PostServiceMock implements IPostService {
             updated_at: post.updatedAt,
             author: post.author.name,
             user_reaction: null,
-            likes: 0,
-            unlikes: 0,
+            likes: post.likes,
+            unlikes: post.unlikes,
+            comment_count: post.commentCount,
         };
     }
 
@@ -139,9 +144,15 @@ export class PostServiceMock implements IPostService {
             updated_at: updatedPost.updatedAt,
             author: updatedPost.author.name,
             user_reaction: null,
-            likes: 0,
-            unlikes: 0,
+            likes: updatedPost.likes,
+            unlikes: updatedPost.unlikes,
+            comment_count: updatedPost.commentCount,
         };
+    }
+
+    public modifyCommentCount(postId: string, delta: number): void {
+        const post = this.posts.find(p => p.id === postId);
+        if (post) post.commentCount += delta;
     }
 
     async remove(id: string, userId: string): Promise<void> {
@@ -171,8 +182,9 @@ export class PostServiceMock implements IPostService {
             updated_at: post.updatedAt,
             author: post.author.name,
             user_reaction: null,
-            likes: 0,
-            unlikes: 0,
+            likes: post.likes,
+            unlikes: post.unlikes,
+            comment_count: post.commentCount,
         }));
     }
 
@@ -189,8 +201,9 @@ export class PostServiceMock implements IPostService {
             updated_at: post.updatedAt,
             author: post.author.name,
             user_reaction: null,
-            likes: 0,
-            unlikes: 0,
+            likes: post.likes,
+            unlikes: post.unlikes,
+            comment_count: post.commentCount,
         }));
     }
 }

@@ -147,8 +147,8 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "parentId": "{{commentId}}",
-    "content": "Reply 2"
+    "parentId": "{{replyId}}",
+    "content": "Reply 3"
 }
 
 ### Update Comment
