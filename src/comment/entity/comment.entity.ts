@@ -1,5 +1,6 @@
 import { Post } from "src/post/entity/post.entity";
 import { User } from "src/user/entity/user.entity";
+import { CommentReaction } from "./comment-reaction.entity";
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
@@ -38,6 +39,15 @@ export class Comment {
 
     @Column({ default: 0 })
     repliesCount: number;
+
+    @OneToMany(() => CommentReaction, (reaction) => reaction.comment)
+    reactions: CommentReaction[];
+
+    @Column({ default: 0 })
+    likes: number;
+
+    @Column({ default: 0 })
+    unlikes: number;
 
     @CreateDateColumn()
     createdAt: Date;

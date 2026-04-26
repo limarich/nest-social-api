@@ -58,7 +58,6 @@ describe('CommentService', () => {
       expect(reply.id).toBeDefined();
       expect(reply.content).toBe('I agree!');
       expect(reply.parentId).toBe('abc-123');
-      expect(reply.parent).toBeDefined();
     });
 
     it('should throw NotFoundException when parent comment does not exist', async () => {
@@ -77,7 +76,7 @@ describe('CommentService', () => {
 
   describe('getComments', () => {
     it('should return top-level comments for a post', async () => {
-      const comments = await commentService.getComments('abc-123');
+      const comments = await commentService.getComments('abc-123', {}, 'abc-123');
 
       expect(comments).toHaveLength(1);
       expect(comments[0].id).toBe('abc-123');
@@ -85,14 +84,14 @@ describe('CommentService', () => {
     });
 
     it('should return empty array when post has no comments', async () => {
-      const comments = await commentService.getComments('nonexistent-post');
+      const comments = await commentService.getComments('nonexistent-post', {}, 'abc-123');
       expect(comments).toHaveLength(0);
     });
 
     it('should not include replies in getComments result', async () => {
       await commentService.createReply({ parentId: 'abc-123', content: 'I am a reply' }, 'abc-123');
 
-      const comments = await commentService.getComments('abc-123');
+      const comments = await commentService.getComments('abc-123', {}, 'abc-123');
       expect(comments.every(c => c.parentId === null)).toBe(true);
     });
   });
@@ -102,13 +101,13 @@ describe('CommentService', () => {
     it('should return replies of a comment', async () => {
       await commentService.createReply({ parentId: 'abc-123', content: 'I agree!' }, 'abc-123');
 
-      const replies = await commentService.getReplies('abc-123');
+      const replies = await commentService.getReplies('abc-123', {}, 'abc-123');
       expect(replies).toHaveLength(1);
       expect(replies[0].parentId).toBe('abc-123');
     });
 
     it('should return empty array when comment has no replies', async () => {
-      const replies = await commentService.getReplies('abc-123');
+      const replies = await commentService.getReplies('abc-123', {}, 'abc-123');
       expect(replies).toHaveLength(0);
     });
   });
@@ -140,7 +139,7 @@ describe('CommentService', () => {
     it('should delete a comment successfully', async () => {
       await commentService.deleteComment('abc-123', 'abc-123');
 
-      const comments = await commentService.getComments('abc-123');
+      const comments = await commentService.getComments('abc-123', {}, 'abc-123');
       expect(comments).toHaveLength(0);
     });
 

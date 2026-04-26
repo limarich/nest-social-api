@@ -8,8 +8,8 @@ import { UpdateCommentDto } from "../dto/update-comment.dto";
 export abstract class ICommentService {
     abstract createComment(dto: CreateCommentDto, userId: string): Promise<CommentResponseDto>;
     abstract createReply(dto: CreateReplyDto, userId: string): Promise<CommentResponseDto>;
-    abstract getComments(postId: string, pagination: Pagination): Promise<CommentResponseDto[]>;
-    abstract getReplies(commentId: string, pagination: Pagination): Promise<CommentResponseDto[]>;
+    abstract getComments(postId: string, pagination: Pagination, userId: string): Promise<CommentResponseDto[]>;
+    abstract getReplies(commentId: string, pagination: Pagination, userId: string): Promise<CommentResponseDto[]>;
     abstract updateComment(dto: UpdateCommentDto, userId: string): Promise<CommentResponseDto>;
     abstract deleteComment(commentId: string, userId: string): Promise<void>;
 }

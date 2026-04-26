@@ -13,6 +13,7 @@ const mockPost: PostResponseDto = {
   user_reaction: null,
   likes: 0,
   unlikes: 0,
+  comment_count: 0,
   created_at: new Date('2024-01-01'),
   updated_at: new Date('2024-01-01'),
 };

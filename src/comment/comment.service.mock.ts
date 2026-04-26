@@ -9,6 +9,8 @@ import { PostServiceMock } from "src/post/post.service.mock";
 import { CreateCommentDto } from "./dto/create-comment.dto";
 import { UpdateCommentDto } from "./dto/update-comment.dto";
 import { CreateReplyDto } from "./dto/create-reply.dto";
+import { CommentResponseDto } from "./dto/comment-response.dto";
+import { Pagination } from "src/common/interfaces/paginations.interface";
 
 @Injectable()
 export class CommentServiceMock implements ICommentService {
@@ -18,6 +20,10 @@ export class CommentServiceMock implements ICommentService {
         private readonly userService: UserServiceMock,
         private readonly postService: PostServiceMock,
     ) { }
+
+    public findComment(id: string): Comment | undefined {
+        return this.comments.find(c => c.id === id);
+    }
 
     public init() {
         this.comments = [
@@ -33,7 +39,10 @@ export class CommentServiceMock implements ICommentService {
                 parentId: null,
                 replies: [],
                 post: new Post(),
-                user: new User()
+                user: new User(),
+                likes: 0,
+                unlikes: 0,
+                reactions: [],
             }
         ];
     }
@@ -46,7 +55,7 @@ export class CommentServiceMock implements ICommentService {
         await this.userService.findOne(userId);
     }
 
-    async createComment(dto: CreateCommentDto, userId: string): Promise<Comment> {
+    async createComment(dto: CreateCommentDto, userId: string): Promise<CommentResponseDto> {
         await this.validatePostExists(dto.postId);
         await this.validateUserExists(userId);
 
@@ -62,15 +71,18 @@ export class CommentServiceMock implements ICommentService {
             parentId: null,
             replies: [],
             post: new Post(),
-            user: new User()
+            user: new User(),
+            likes: 0,
+            unlikes: 0,
+            reactions: [],
         };
 
         this.comments.push(newComment);
         this.postService.modifyCommentCount(dto.postId, 1);
-        return newComment;
+        return { ...newComment, user_reaction: null };
     }
 
-    async createReply(dto: CreateReplyDto, userId: string): Promise<Comment> {
+    async createReply(dto: CreateReplyDto, userId: string): Promise<CommentResponseDto> {
         await this.validateUserExists(userId);
 
         const parentComment = this.comments.find((comment) => comment.id === dto.parentId);
@@ -91,23 +103,30 @@ export class CommentServiceMock implements ICommentService {
             parentId: dto.parentId,
             replies: [],
             post: new Post(),
-            user: new User()
+            user: new User(),
+            likes: 0,
+            unlikes: 0,
+            reactions: [],
         };
 
         this.comments.push(newComment);
         parentComment.repliesCount += 1;
-        return newComment;
+        return { ...newComment, user_reaction: null };
     }
 
-    async getComments(postId: string): Promise<Comment[]> {
-        return this.comments.filter((comment) => comment.postId === postId && comment.parentId === null);
+    async getComments(postId: string, _pagination: Pagination, _userId: string): Promise<CommentResponseDto[]> {
+        return this.comments
+            .filter((c) => c.postId === postId && c.parentId === null)
+            .map((c) => ({ ...c, user_reaction: null }));
     }
 
-    async getReplies(commentId: string): Promise<Comment[]> {
-        return this.comments.filter((comment) => comment.parentId === commentId);
+    async getReplies(commentId: string, _pagination: Pagination, _userId: string): Promise<CommentResponseDto[]> {
+        return this.comments
+            .filter((c) => c.parentId === commentId)
+            .map((c) => ({ ...c, user_reaction: null }));
     }
 
-    async updateComment(dto: UpdateCommentDto, userId: string): Promise<Comment> {
+    async updateComment(dto: UpdateCommentDto, userId: string): Promise<CommentResponseDto> {
         const comment = this.comments.find((comment) => comment.id === dto.commentId);
 
         if (!comment) {
@@ -120,7 +139,7 @@ export class CommentServiceMock implements ICommentService {
 
         comment.content = dto.content;
         comment.updatedAt = new Date();
-        return comment;
+        return { ...comment, user_reaction: null };
     }
 
     async deleteComment(commentId: string, userId: string): Promise<void> {

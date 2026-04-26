@@ -160,3 +160,34 @@ Authorization: Bearer {{token}}
     "commentId": "{{commentId}}",
     "content": "Reply 2 updated"
 }
+
+### Delete Comment
+DELETE {{baseUrl}}/comment/{{commentId}}
+Authorization: Bearer {{token}}
+
+### React To Comment (like)
+POST {{baseUrl}}/comment/react/{{commentId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "type": "like"
+}
+
+### React To Comment (unlike)
+POST {{baseUrl}}/comment/react/{{commentId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "type": "unlike"
+}
+
+### React To Reply
+POST {{baseUrl}}/comment/react/{{replyId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "type": "like"
+}

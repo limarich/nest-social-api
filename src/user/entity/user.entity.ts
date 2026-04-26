@@ -4,6 +4,7 @@ import { UserRole } from "src/common/enum/roles.enum";
 import { Post } from "src/post/entity/post.entity";
 import { PostReaction } from "src/post/entity/post-reaction.entity";
 import { Comment } from "src/comment/entity/comment.entity";
+import { CommentReaction } from "src/comment/entity/comment-reaction.entity";
 
 @Entity()
 @Unique(['email'])
@@ -46,4 +47,7 @@ export class User {
 
     @OneToMany(() => Comment, (comment) => comment.user)
     comments: Comment[];
+
+    @OneToMany(() => CommentReaction, (reaction) => reaction.user)
+    commentReactions: CommentReaction[];
 }
