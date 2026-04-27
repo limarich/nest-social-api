@@ -8,11 +8,15 @@ import { Repository } from "typeorm";
 import { Pagination } from "src/common/interfaces/paginations.interface";
 import { AbstractHashService } from "src/common/interfaces/hash.interface";
 import { User } from "./entity/user.entity";
+import { UserStats } from "./entity/user-stats.entity";
 
 @Injectable()
 export class UserService implements IUserService {
-    constructor(@InjectRepository(User) readonly userRepository: Repository<User>,
-        readonly hashService: AbstractHashService) { }
+    constructor(
+        @InjectRepository(User) readonly userRepository: Repository<User>,
+        @InjectRepository(UserStats) private readonly userStatsRepository: Repository<UserStats>,
+        readonly hashService: AbstractHashService,
+    ) { }
 
     async findAll(pagination: Pagination = {}): Promise<UserResponseDto[]> {
         const { page = 1, limit = 10 } = pagination;
@@ -51,6 +55,7 @@ export class UserService implements IUserService {
         try {
             const hash = await this.hashService.hash(dto.password);
             const user = await this.userRepository.save({ ...dto, hashedPassword: hash });
+            await this.userStatsRepository.save({ userId: user.id });
             const { hashedPassword, hashedRefreshToken, ...userResponse } = user;
             return userResponse;
         }

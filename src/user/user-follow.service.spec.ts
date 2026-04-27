@@ -29,7 +29,7 @@ describe('UserFollowService', () => {
                     useValue: {
                         findOne: jest.fn(),
                         save: jest.fn(),
-                        delete: jest.fn(),
+                        remove: jest.fn(),
                         find: jest.fn(),
                     },
                 },
@@ -85,7 +85,7 @@ describe('UserFollowService', () => {
             userRepository.findOne.mockResolvedValue({ id: '2' });
             userFollowRepository.findOne.mockResolvedValue({ follower_id: '1', following_id: '2' });
             await service.unfollow('1', '2');
-            expect(userFollowRepository.delete).toHaveBeenCalled();
+            expect(userFollowRepository.remove).toHaveBeenCalled();
         });
     });
 

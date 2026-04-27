@@ -61,10 +61,7 @@ export class UserFollowService implements IUserFollowService {
             throw new ConflictException(`User ${follower_id} is not following user ${following_id}`);
         }
 
-        await this.userFollowRepository.delete({
-            follower_id: follower_id,
-            following_id: following_id,
-        });
+        await this.userFollowRepository.remove(followRelationship);
 
         return;
     }

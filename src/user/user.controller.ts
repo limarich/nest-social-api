@@ -7,14 +7,25 @@ import { TokenPayload } from 'src/common/decorators/token_payload.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { UserRole } from 'src/common/enum/roles.enum';
 import { Public } from 'src/common/decorators/public.decorator';
+import { UserStatsService } from './user-stats.service';
 
 @Controller('user')
 export class UserController {
-    constructor(private readonly userService: UserService) { }
+    constructor(private readonly userService: UserService, private readonly userStatsService: UserStatsService) { }
 
     @Get()
     findAll(@Query() pagination: Pagination) {
         return this.userService.findAll(pagination);
+    }
+
+    @Get('my-stats')
+    findMyStats(@TokenPayload('sub') userId: string) {
+        return this.userStatsService.findStats(userId);
+    }
+
+    @Get('stats/:id')
+    findStats(@Param('id') id: string) {
+        return this.userStatsService.findStats(id);
     }
 
     @Get(':id')

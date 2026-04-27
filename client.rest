@@ -10,7 +10,7 @@
 @replyId = {{list_replies.response.body.$[0].id}}
 
 ### List Users
-GET {{baseUrl}}/user?page=1&limit=10
+GET {{baseUrl}}/user?page=1&limit=50
 Authorization: Bearer {{token}}
 
 ### Find User
@@ -25,8 +25,8 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "name": "John 2",
-    "email": "richard2.teste@gmail.com",
+    "name": "John 3",
+    "email": "richard3.teste@gmail.com",
     "password": "password"
 } 
 
@@ -54,7 +54,7 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-    "email": "richard1.teste@gmail.com",
+    "email": "richard3.teste@gmail.com",
     "password": "password"
 }
 
@@ -194,7 +194,7 @@ Authorization: Bearer {{token}}
 
 
 ### Follow User
-POST {{baseUrl}}/user/follow/0e6d0708-07c0-4e6b-a6e5-300846089f3f
+POST {{baseUrl}}/user/follow/a4d977b3-dd25-47ab-9719-ccbb66cd8530
 Authorization: Bearer {{token}}
 
 ### Unfollow User
@@ -207,4 +207,12 @@ Authorization: Bearer {{token}}
 
 ### List Following
 GET {{baseUrl}}/user/following/{{userId}}
+Authorization: Bearer {{token}}
+
+### Find User Stats
+GET {{baseUrl}}/user/stats/{{userId}}
+Authorization: Bearer {{token}}
+
+### Find My Stats
+GET {{baseUrl}}/user/my-stats
 Authorization: Bearer {{token}}
