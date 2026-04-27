@@ -191,3 +191,20 @@ Authorization: Bearer {{token}}
 {
     "type": "like"
 }
+
+
+### Follow User
+POST {{baseUrl}}/user/follow/0e6d0708-07c0-4e6b-a6e5-300846089f3f
+Authorization: Bearer {{token}}
+
+### Unfollow User
+POST {{baseUrl}}/user/unfollow/0e6d0708-07c0-4e6b-a6e5-300846089f3f
+Authorization: Bearer {{token}}
+
+### List Followers
+GET {{baseUrl}}/user/followers/{{userId}}
+Authorization: Bearer {{token}}
+
+### List Following
+GET {{baseUrl}}/user/following/{{userId}}
+Authorization: Bearer {{token}}

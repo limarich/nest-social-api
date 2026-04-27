@@ -28,7 +28,9 @@ export class UserServiceMock implements IUserService {
             posts: [],
             reactions: [],
             comments: [],
-            commentReactions: []
+            commentReactions: [],
+            followers: [],
+            following: []
         },
             {
                 email: "email2@gmail.com",
@@ -42,7 +44,9 @@ export class UserServiceMock implements IUserService {
                 posts: [],
                 reactions: [],
                 comments: [],
-                commentReactions: []
+                commentReactions: [],
+                followers: [],
+                following: []
             })
 
     }
@@ -94,7 +98,9 @@ export class UserServiceMock implements IUserService {
             posts: [],
             reactions: [],
             comments: [],
-            commentReactions: []
+            commentReactions: [],
+            followers: [],
+            following: []
         }
         this.users.push(newUser);
         const { hashedPassword, hashedRefreshToken, ...userResponse } = newUser;

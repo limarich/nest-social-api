@@ -5,6 +5,7 @@ import { Post } from "src/post/entity/post.entity";
 import { PostReaction } from "src/post/entity/post-reaction.entity";
 import { Comment } from "src/comment/entity/comment.entity";
 import { CommentReaction } from "src/comment/entity/comment-reaction.entity";
+import { UserFollow } from "./user-follow.entity";
 
 @Entity()
 @Unique(['email'])
@@ -50,4 +51,10 @@ export class User {
 
     @OneToMany(() => CommentReaction, (reaction) => reaction.user)
     commentReactions: CommentReaction[];
+
+    @OneToMany(() => UserFollow, (userFollow) => userFollow.follower)
+    following: UserFollow[];
+
+    @OneToMany(() => UserFollow, (userFollow) => userFollow.following)
+    followers: UserFollow[];
 }
