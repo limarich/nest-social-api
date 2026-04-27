@@ -37,6 +37,72 @@ API REST para uma rede social simples com suporte a postagens, comentários e si
 - Apenas administradores podem remover comentários permanentemente (hard delete)
 - Comentários são exibidos de forma hierárquica (comentário pai e respostas)
 
+### Autenticação (complementar)
+
+- Um usuário autenticado pode fazer logout, invalidando seu refresh token no banco
+
+### Perfil de usuário
+
+- Um usuário pode adicionar informações ao seu perfil: bio, foto de perfil, site e localização
+- A foto de perfil deve ser armazenada e acessível via URL
+
+### Upload de mídia
+
+- Um usuário autenticado pode anexar imagens a uma postagem
+- Imagens devem ser armazenadas e acessíveis via URL pública
+
+### Feed personalizado
+
+- Um usuário autenticado pode visualizar um feed com as postagens de quem segue, ordenado por data
+
+### Busca
+
+- Um usuário autenticado pode buscar outros usuários por nome ou email
+- Um usuário autenticado pode buscar postagens por palavra-chave no título ou conteúdo
+
+### Hashtags
+
+- Um usuário pode adicionar hashtags a uma postagem
+- Um usuário autenticado pode listar postagens por hashtag
+
+### Notificações
+
+- Um usuário recebe notificação quando alguém curte sua postagem ou comentário
+- Um usuário recebe notificação quando alguém comenta ou responde em sua postagem
+- Um usuário recebe notificação quando alguém começa a segui-lo
+- Um usuário pode listar suas notificações (lidas e não lidas)
+- Um usuário pode marcar notificações como lidas
+
+### Postagens salvas
+
+- Um usuário autenticado pode salvar uma postagem para leitura posterior
+- Um usuário autenticado pode remover uma postagem dos salvos
+- Um usuário autenticado pode listar suas postagens salvas
+
+### Compartilhamento / Repost
+
+- Um usuário autenticado pode repostar uma postagem de outro usuário
+- O repost mantém referência à postagem original e ao autor original
+
+### Bloqueio e silenciamento
+
+- Um usuário pode bloquear outro usuário, impedindo interações entre eles
+- Um usuário pode silenciar outro usuário, ocultando suas postagens do feed sem bloquear
+- Um usuário pode desbloquear ou dessilenciar outro usuário
+
+### Mensagens diretas
+
+- Um usuário autenticado pode enviar mensagens privadas para outro usuário
+- Um usuário autenticado pode listar suas conversas
+- Um usuário autenticado pode listar as mensagens de uma conversa específica
+
+### Verificação de e-mail e recuperação de senha
+
+- Ao criar conta, o usuário recebe um e-mail de verificação
+- Apenas contas verificadas podem acessar recursos autenticados
+- Um usuário pode solicitar reset de senha via e-mail
+- O link de reset deve expirar após um período configurável
+
 ---
 
 ## Requisitos não funcionais
