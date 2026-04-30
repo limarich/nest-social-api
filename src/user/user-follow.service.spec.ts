@@ -5,11 +5,12 @@ import { getRepositoryToken } from "@nestjs/typeorm";
 import { User } from "./entity/user.entity";
 import { UserFollow } from "./entity/user-follow.entity";
 import { NotFoundException, ConflictException, BadRequestException } from "@nestjs/common";
+import { Repository } from "typeorm";
 
 describe('UserFollowService', () => {
     let service: IUserFollowService;
-    let userRepository: any;
-    let userFollowRepository: any;
+    let userRepository: jest.Mocked<Repository<User>>;
+    let userFollowRepository: jest.Mocked<Repository<UserFollow>>;
 
     beforeEach(async () => {
         const moduleRef = await Test.createTestingModule({
@@ -56,13 +57,13 @@ describe('UserFollowService', () => {
         });
 
         it('should throw ConflictException if already followed', async () => {
-            userRepository.findOne.mockResolvedValue({ id: '2' });
-            userFollowRepository.findOne.mockResolvedValue({ follower_id: '1', following_id: '2' });
+            userRepository.findOne.mockResolvedValue({ id: '2' } as User);
+            userFollowRepository.findOne.mockResolvedValue({ follower_id: '1', following_id: '2' } as UserFollow);
             await expect(service.follow('1', '2')).rejects.toThrow(ConflictException);
         });
 
         it('should follow successfully', async () => {
-            userRepository.findOne.mockResolvedValue({ id: '2' });
+            userRepository.findOne.mockResolvedValue({ id: '2' } as User);
             userFollowRepository.findOne.mockResolvedValue(null);
             await service.follow('1', '2');
             expect(userFollowRepository.save).toHaveBeenCalled();
@@ -76,14 +77,14 @@ describe('UserFollowService', () => {
         });
 
         it('should throw ConflictException if not followed', async () => {
-            userRepository.findOne.mockResolvedValue({ id: '2' });
+            userRepository.findOne.mockResolvedValue({ id: '2' } as User);
             userFollowRepository.findOne.mockResolvedValue(null);
             await expect(service.unfollow('1', '2')).rejects.toThrow(ConflictException);
         });
 
         it('should unfollow successfully', async () => {
-            userRepository.findOne.mockResolvedValue({ id: '2' });
-            userFollowRepository.findOne.mockResolvedValue({ follower_id: '1', following_id: '2' });
+            userRepository.findOne.mockResolvedValue({ id: '2' } as User);
+            userFollowRepository.findOne.mockResolvedValue({ follower_id: '1', following_id: '2' } as UserFollow);
             await service.unfollow('1', '2');
             expect(userFollowRepository.remove).toHaveBeenCalled();
         });
@@ -91,10 +92,10 @@ describe('UserFollowService', () => {
 
     describe('findFollowers', () => {
         it('should return followers', async () => {
-            userRepository.findOne.mockResolvedValue({ id: '1' });
+            userRepository.findOne.mockResolvedValue({ id: '1' } as User);
             userFollowRepository.find.mockResolvedValue([
                 { follower: { id: '2', name: 'User 2' } }
-            ]);
+            ] as UserFollow[]);
             const result = await service.findFollowers('1');
             expect(result).toHaveLength(1);
             expect(result[0].id).toBe('2');
@@ -106,10 +107,10 @@ describe('UserFollowService', () => {
 
     describe('findFollowing', () => {
         it('should return following', async () => {
-            userRepository.findOne.mockResolvedValue({ id: '1' });
+            userRepository.findOne.mockResolvedValue({ id: '1' } as User);
             userFollowRepository.find.mockResolvedValue([
                 { following: { id: '3', name: 'User 3' } }
-            ]);
+            ] as UserFollow[]);
             const result = await service.findFollowing('1');
             expect(result).toHaveLength(1);
             expect(result[0].id).toBe('3');

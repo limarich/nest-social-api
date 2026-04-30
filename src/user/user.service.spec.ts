@@ -1,88 +1,219 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { EMAIL_ADDRESS, UserServiceMock } from './user.service.mock';
-import { NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Test } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { ConflictException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { UserService } from './user.service';
+import { User } from './entity/user.entity';
+import { UserStats } from './entity/user-stats.entity';
+import { AbstractHashService } from 'src/common/interfaces/hash.interface';
+import { UserRole } from 'src/common/enum/roles.enum';
+import { Repository } from 'typeorm';
+import { DeleteResult } from 'typeorm/browser';
+
+const mockUser: User = {
+  id: 'user-1',
+  name: 'Richard',
+  email: 'test@gmail.com',
+  hashedPassword: 'hashed-pw',
+  hashedRefreshToken: 'hashed-rt',
+  role: UserRole.USER,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  posts: [],
+  reactions: [],
+  comments: [],
+  commentReactions: [],
+  followers: [],
+  following: [],
+};
 
 describe('UserService', () => {
-  let service: UserServiceMock;
+  let service: UserService;
+  let userRepository: jest.Mocked<Repository<User>>;
+  let userStatsRepository: jest.Mocked<Repository<UserStats>>;
+  let hashService: jest.Mocked<AbstractHashService>;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [UserServiceMock],
+    const moduleRef = await Test.createTestingModule({
+      providers: [
+        UserService,
+        {
+          provide: getRepositoryToken(User),
+          useValue: {
+            find: jest.fn(),
+            findOneBy: jest.fn(),
+            save: jest.fn(),
+            delete: jest.fn(),
+          },
+        },
+        {
+          provide: getRepositoryToken(UserStats),
+          useValue: {
+            save: jest.fn(),
+          },
+        },
+        {
+          provide: AbstractHashService,
+          useValue: {
+            hash: jest.fn(),
+            verify: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
-    service = module.get<UserServiceMock>(UserServiceMock);
-    await service.init(); // Initialize the mock database
+    service = moduleRef.get(UserService);
+    userRepository = moduleRef.get(getRepositoryToken(User));
+    userStatsRepository = moduleRef.get(getRepositoryToken(UserStats));
+    hashService = moduleRef.get(AbstractHashService);
   });
-
-  it('should find user by email', async () => {
-    const user = await service.findByEmail(EMAIL_ADDRESS);
-    expect(user).toBeDefined();
-  });
-
-  it('should not find user by email', async () => {
-    expect(await service.findByEmail('invalid-email')).toBeUndefined();
-  })
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  it('should create a user', async () => {
-    const user = await service.create({
-      name: 'John', email: "test123@gmail.com", password: 'password'
+  describe('findAll', () => {
+    it('should return list of users', async () => {
+      userRepository.find.mockResolvedValue([mockUser]);
+
+      const result = await service.findAll();
+
+      expect(result).toHaveLength(1);
+      expect(userRepository.find).toHaveBeenCalled();
     });
-    expect(user).toBeDefined();
+
+    it('should apply pagination skip and take to repository', async () => {
+      userRepository.find.mockResolvedValue([]);
+
+      await service.findAll({ page: 2, limit: 5 });
+
+      expect(userRepository.find).toHaveBeenCalledWith(
+        expect.objectContaining({ skip: 5, take: 5 }),
+      );
+    });
   });
 
-  it('should update a user', async () => {
-    const user = await service.update({
-      id: 'abc-123', name: 'John', email: EMAIL_ADDRESS, password: 'password'
-    }, 'abc-123');
-    expect(user).toBeDefined();
+  describe('findOne', () => {
+    it('should return user without sensitive fields when found', async () => {
+      userRepository.findOneBy.mockResolvedValue(mockUser);
+
+      const result = await service.findOne('user-1');
+
+      expect(result).toBeDefined();
+      expect((result as User).hashedPassword).toBeUndefined();
+      expect((result as User).hashedRefreshToken).toBeUndefined();
+      expect(userRepository.findOneBy).toHaveBeenCalledWith({ id: 'user-1' });
+    });
+
+    it('should throw NotFoundException when user does not exist', async () => {
+      userRepository.findOneBy.mockResolvedValue(null);
+
+      await expect(service.findOne('nonexistent')).rejects.toThrow(NotFoundException);
+    });
   });
 
-  it('should not update a user', async () => {
-    await expect(service.update({
-      id: 'abc-1234', name: 'John', email: EMAIL_ADDRESS, password: 'password'
-    }, 'abc-123')).rejects.toThrow(NotFoundException);
-  })
+  describe('create', () => {
+    it('should hash password and save user and stats', async () => {
+      hashService.hash.mockResolvedValue('hashed-pw');
+      userRepository.save.mockResolvedValue({ ...mockUser, id: 'new-user' });
+      userStatsRepository.save.mockResolvedValue({} as UserStats);
 
-  it('should not update a different user', async () => {
-    await expect(service.update({
-      id: 'def-456', name: 'John', email: 'email2@gmail.com', password: 'password'
-    }, 'abc-123')).rejects.toThrow(UnauthorizedException);
-  })
+      await service.create({ name: 'John', email: 'john@test.com', password: 'pass123' });
 
-  it('should delete a user', async () => {
-    const user = await service.remove('abc-123', 'abc-123');
-    expect(user).toBeUndefined();
+      expect(hashService.hash).toHaveBeenCalledWith('pass123');
+      expect(userRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({ hashedPassword: 'hashed-pw' }),
+      );
+      expect(userStatsRepository.save).toHaveBeenCalledWith({ userId: 'new-user' });
+    });
+
+    it('should throw ConflictException on duplicate email (pg error 23505)', async () => {
+      hashService.hash.mockResolvedValue('hashed-pw');
+      userRepository.save.mockRejectedValue({ code: '23505', detail: 'email already exists' });
+
+      await expect(
+        service.create({ name: 'John', email: 'dup@test.com', password: 'pass123' }),
+      ).rejects.toThrow(ConflictException);
+    });
+
+    it('should throw ConflictException on duplicate nickname (pg error 23505)', async () => {
+      hashService.hash.mockResolvedValue('hashed-pw');
+      userRepository.save.mockRejectedValue({ code: '23505', detail: 'nickname already exists' });
+
+      await expect(
+        service.create({ name: 'John', email: 'john@test.com', password: 'pass123' }),
+      ).rejects.toThrow(ConflictException);
+    });
+
+    it('should rethrow unexpected errors', async () => {
+      hashService.hash.mockResolvedValue('hashed-pw');
+      userRepository.save.mockRejectedValue(new Error('db connection lost'));
+
+      await expect(
+        service.create({ name: 'John', email: 'john@test.com', password: 'pass123' }),
+      ).rejects.toThrow('db connection lost');
+    });
   });
 
-  it('should not delete a user', async () => {
-    await expect(service.remove('abc-1234', 'abc-123')).rejects.toThrow(NotFoundException);
-  })
+  describe('update', () => {
+    it('should throw NotFoundException when user does not exist', async () => {
+      userRepository.findOneBy.mockResolvedValue(null);
 
-  it('should not delete a different user', async () => {
-    await expect(service.remove('abc-123', 'def-456')).rejects.toThrow(UnauthorizedException);
-  })
+      await expect(
+        service.update({ id: 'nonexistent', name: 'John' }, 'user-1'),
+      ).rejects.toThrow(NotFoundException);
+    });
 
-  it('should find a user', async () => {
-    const user = await service.findOne('abc-123');
-    expect(user).toBeDefined();
+    it('should throw UnauthorizedException when updating another user', async () => {
+      userRepository.findOneBy.mockResolvedValue(mockUser);
+
+      await expect(
+        service.update({ id: 'user-1', name: 'Hacked' }, 'user-2'),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('should save updated user and return without sensitive fields', async () => {
+      const updated = { ...mockUser, name: 'Updated Name' };
+      userRepository.findOneBy.mockResolvedValue(mockUser);
+      userRepository.save.mockResolvedValue(updated);
+
+      const result = await service.update({ id: 'user-1', name: 'Updated Name' }, 'user-1');
+
+      expect(userRepository.save).toHaveBeenCalled();
+      expect(result.name).toBe('Updated Name');
+      expect((result as any).hashedPassword).toBeUndefined();
+    });
+
+    it('should hash new password when provided in dto', async () => {
+      userRepository.findOneBy.mockResolvedValue(mockUser);
+      userRepository.save.mockResolvedValue(mockUser);
+      hashService.hash.mockResolvedValue('new-hashed-pw');
+
+      await service.update({ id: 'user-1', password: 'newpass' }, 'user-1');
+
+      expect(hashService.hash).toHaveBeenCalledWith('newpass');
+    });
   });
 
-  it('should not find a user', async () => {
-    await expect(service.findOne('abc-1234')).rejects.toThrow(NotFoundException);
-  })
+  describe('remove', () => {
+    it('should throw NotFoundException when user does not exist', async () => {
+      userRepository.findOneBy.mockResolvedValue(null);
 
-  it('should find all users', async () => {
-    const users = await service.findAll();
-    expect(users).toBeDefined();
+      await expect(service.remove('nonexistent', 'user-1')).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw UnauthorizedException when deleting another user', async () => {
+      userRepository.findOneBy.mockResolvedValue(mockUser);
+
+      await expect(service.remove('user-1', 'user-2')).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('should call delete with the correct id', async () => {
+      userRepository.findOneBy.mockResolvedValue(mockUser);
+      userRepository.delete.mockResolvedValue({ affected: 1 } as DeleteResult);
+
+      await service.remove('user-1', 'user-1');
+
+      expect(userRepository.delete).toHaveBeenCalledWith('user-1');
+    });
   });
-
-  it('should find all users with pagination', async () => {
-    const users = await service.findAll({ page: 1, limit: 10 });
-    expect(users).toBeDefined();
-  });
-
 });

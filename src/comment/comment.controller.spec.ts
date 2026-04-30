@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CommentController } from './comment.controller';
 import { CommentService } from './comment.service';
 import { CommentReactionService } from './comment-reaction.service';
+import { CommentReactionDto } from './dto/comment-reaction.dto';
 
 describe('CommentController', () => {
   let controller: CommentController;
@@ -69,7 +70,7 @@ describe('CommentController', () => {
     it('should call commentReactionService.react', async () => {
       const commentId = 'comment-1';
       const userId = 'user-1';
-      const dto = { type: 'like' as any };
+      const dto = { type: 'like' } as CommentReactionDto;
       await controller.react(commentId, userId, dto);
       expect(commentReactionService.react).toHaveBeenCalledWith(commentId, userId, 'like');
     });

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { EMAIL_ADDRESS } from 'src/user/user.service.mock';
+import { EMAIL_ADDRESS } from 'src/common/contants';
 import { BadRequestException } from '@nestjs/common';
 
 describe('AuthController', () => {

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
-import { EMAIL_ADDRESS } from './user.service.mock';
+import { EMAIL_ADDRESS } from 'src/common/contants';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserStatsService } from './user-stats.service';
