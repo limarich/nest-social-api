@@ -87,10 +87,11 @@ export class UserService implements IUserService {
             if (dto.password) {
                 const hash = await this.hashService.hash(dto.password);
                 updatedUser.hashedPassword = hash;
+                console.log(updatedUser.hashedPassword);
             }
 
             const savedUser = await this.userRepository.save(updatedUser);
-            const { hashedPassword, hashedRefreshToken, ...userResponse } = savedUser;
+            const { hashedPassword, hashedRefreshToken, password, ...userResponse } = savedUser;
             return userResponse;
         } catch (error) {
             if (error.code === '23505') {
