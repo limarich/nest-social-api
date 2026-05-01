@@ -16,6 +16,7 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { PostModule } from 'src/post/post.module';
 import { CommentModule } from 'src/comment/comment.module';
+import { UploadModule } from 'src/upload/upload.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { CommentModule } from 'src/comment/comment.module';
     AuthModule,
     PostModule,
     CommentModule,
+    UploadModule,
     ThrottlerModule.forRoot([
       {
         name: 'short',

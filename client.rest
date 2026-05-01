@@ -38,11 +38,12 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "id": "8f56ce28-72d1-489c-8956-660d97830441",
+    "id": "5f5b41af-610a-4286-abe5-a2a18e7b516d",
     "name": "John",
     "email": "richard.esclima@gmail.com",
     "password": "password",
-    "nickname": "richard123"
+    "nickname": "richard123",
+    "imageUrl": "http://res.cloudinary.com/drabobg5j/image/upload/v1777643044/avatars/ipje8bypudamfhwtlj43.png"
 } 
 
 ### Delete User
@@ -217,4 +218,9 @@ Authorization: Bearer {{token}}
 
 ### Find My Stats
 GET {{baseUrl}}/user/my-stats
+Authorization: Bearer {{token}}
+
+### Generate Signed URL
+# @name generate_url
+GET {{baseUrl}}/upload/sign?folder=avatars
 Authorization: Bearer {{token}}
