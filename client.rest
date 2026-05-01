@@ -27,7 +27,8 @@ Authorization: Bearer {{token}}
 {
     "name": "John 3",
     "email": "richard3.teste@gmail.com",
-    "password": "password"
+    "password": "password",
+    "nickname": "richard123"
 } 
 
 ### Update User
@@ -40,7 +41,8 @@ Authorization: Bearer {{token}}
     "id": "8f56ce28-72d1-489c-8956-660d97830441",
     "name": "John",
     "email": "richard.esclima@gmail.com",
-    "password": "password"
+    "password": "password",
+    "nickname": "richard123"
 } 
 
 ### Delete User

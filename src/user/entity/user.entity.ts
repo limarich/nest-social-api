@@ -57,4 +57,13 @@ export class User {
 
     @OneToMany(() => UserFollow, (userFollow) => userFollow.following)
     followers: UserFollow[];
+
+    @Column({ length: 255, default: '' })
+    bio: string;
+
+    @Column({ length: 50, nullable: false, unique: true })
+    nickname: string;
+
+    @Column({ nullable: true })
+    imageUrl: string;
 }

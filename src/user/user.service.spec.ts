@@ -24,6 +24,9 @@ const mockUser: User = {
   commentReactions: [],
   followers: [],
   following: [],
+  bio: '',
+  nickname: '',
+  imageUrl: '',
 };
 
 describe('UserService', () => {
@@ -117,11 +120,11 @@ describe('UserService', () => {
       userRepository.save.mockResolvedValue({ ...mockUser, id: 'new-user' });
       userStatsRepository.save.mockResolvedValue({} as UserStats);
 
-      await service.create({ name: 'John', email: 'john@test.com', password: 'pass123' });
+      await service.create({ name: 'John', email: 'john@test.com', password: 'pass123', nickname: 'john', bio: 'bio', imageUrl: 'image-url' });
 
       expect(hashService.hash).toHaveBeenCalledWith('pass123');
       expect(userRepository.save).toHaveBeenCalledWith(
-        expect.objectContaining({ hashedPassword: 'hashed-pw' }),
+        expect.objectContaining({ hashedPassword: 'hashed-pw', nickname: 'john', bio: 'bio', imageUrl: 'image-url' }),
       );
       expect(userStatsRepository.save).toHaveBeenCalledWith({ userId: 'new-user' });
     });
@@ -131,7 +134,7 @@ describe('UserService', () => {
       userRepository.save.mockRejectedValue({ code: '23505', detail: 'email already exists' });
 
       await expect(
-        service.create({ name: 'John', email: 'dup@test.com', password: 'pass123' }),
+        service.create({ name: 'John', email: 'dup@test.com', password: 'pass123', nickname: 'john', bio: 'bio', imageUrl: 'image-url' }),
       ).rejects.toThrow(ConflictException);
     });
 
@@ -140,7 +143,7 @@ describe('UserService', () => {
       userRepository.save.mockRejectedValue({ code: '23505', detail: 'nickname already exists' });
 
       await expect(
-        service.create({ name: 'John', email: 'john@test.com', password: 'pass123' }),
+        service.create({ name: 'John', email: 'john@test.com', password: 'pass123', nickname: 'john', bio: 'bio', imageUrl: 'image-url' }),
       ).rejects.toThrow(ConflictException);
     });
 
@@ -149,7 +152,7 @@ describe('UserService', () => {
       userRepository.save.mockRejectedValue(new Error('db connection lost'));
 
       await expect(
-        service.create({ name: 'John', email: 'john@test.com', password: 'pass123' }),
+        service.create({ name: 'John', email: 'john@test.com', password: 'pass123', nickname: 'john', bio: 'bio', imageUrl: 'image-url' }),
       ).rejects.toThrow('db connection lost');
     });
   });

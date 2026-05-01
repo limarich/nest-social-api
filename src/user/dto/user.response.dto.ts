@@ -7,4 +7,7 @@ export class UserResponseDto {
     role: UserRole;
     createdAt?: Date;
     updatedAt?: Date;
+    bio: string;
+    nickname: string;
+    imageUrl?: string;
 }

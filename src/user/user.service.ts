@@ -32,6 +32,9 @@ export class UserService implements IUserService {
                 email: true,
                 createdAt: true,
                 updatedAt: true,
+                bio: true,
+                nickname: true,
+                imageUrl: true
             }
         })
         return users;
@@ -61,6 +64,9 @@ export class UserService implements IUserService {
         }
         catch (error) {
             if (error.code === '23505') {
+                if (error.detail && error.detail.includes('nickname')) {
+                    throw new ConflictException(`User with nickname ${dto.nickname} already exists`);
+                }
                 throw new ConflictException(`User with email ${dto.email} already exists`);
             }
             throw error;
@@ -82,17 +88,15 @@ export class UserService implements IUserService {
                 const hash = await this.hashService.hash(dto.password);
                 updatedUser.hashedPassword = hash;
             }
-            if (dto.email) {
-                const userWithEmail = await this.userRepository.findOneBy({ email: dto.email });
-                if (userWithEmail && userWithEmail.id !== dto.id) {
-                    throw new ConflictException(`User with email ${dto.email} already exists`);
-                }
-            }
-            const user = await this.userRepository.save(updatedUser);
-            const { hashedPassword, hashedRefreshToken, ...userResponse } = user;
+
+            const savedUser = await this.userRepository.save(updatedUser);
+            const { hashedPassword, hashedRefreshToken, ...userResponse } = savedUser;
             return userResponse;
         } catch (error) {
             if (error.code === '23505') {
+                if (error.detail && error.detail.includes('nickname')) {
+                    throw new ConflictException(`User with nickname ${dto.nickname} already exists`);
+                }
                 throw new ConflictException(`User with email ${dto.email} already exists`);
             }
             throw error;

@@ -3,7 +3,6 @@ import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entity/user.entity';
-import { UserServiceMock } from './user.service.mock';
 import { UserFollow } from './entity/user-follow.entity';
 import { UserFollowService } from './user-follow.service';
 import { UserFollowController } from './user-follow.controller';
@@ -13,8 +12,8 @@ import { UserStatsService } from './user-stats.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, UserFollow, UserStats])],
-  providers: [UserService, UserServiceMock, UserFollowService, UserFollowSubscriber, UserStatsService],
+  providers: [UserService, UserFollowService, UserFollowSubscriber, UserStatsService],
   controllers: [UserController, UserFollowController],
-  exports: [UserService, UserServiceMock, UserFollowService]
+  exports: [UserService, UserFollowService]
 })
 export class UserModule { }
